@@ -1,1 +1,1 @@
-from busybeaver.busybeaver import hi 
+from .busybeaver import Hut

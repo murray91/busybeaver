@@ -1,5 +1,5 @@
 # busybeaver
-This package aims to simplify post-processing of model results into GIS formats.
+This package aims to simplify post-processing of MIKE model results into GIS formats.
 
 The main objectives are to:
 

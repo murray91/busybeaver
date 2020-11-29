@@ -1,2 +1,2 @@
-def helloWorld():
+def hi():
     print("Hello world!")

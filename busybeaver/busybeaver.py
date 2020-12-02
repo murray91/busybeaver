@@ -1,5 +1,6 @@
 import configparser
 import logging
+from .constants import *
 
 logging.basicConfig(filename='bb.log', level=logging.DEBUG)
 
@@ -23,9 +24,39 @@ class Hut:
         Loads a configuration .ini file into the hut.
         """
 
+        # Read the config file
         logging.info("Reading config file.")
         config = configparser.ConfigParser()
         config.read(self.config_file)
 
-        self.models = config.sections()[1:]
-        logging.info("Loaded following models: {}".format(self.models))
+        # Create empty Model objects for each model
+        models = config.sections()[1:]
+        for name in models:
+            new_model = Model(name)
+            self.models.append(new_model)
+            logging.info("Created model for {}.".format(new_model.name))
+        
+
+class Model:
+    """
+    A class for holding information related to a single model
+
+    Usage example:
+    cool_model = Model("Name of model")
+
+    Note: Model instances are intended to be initialized through the Hut object
+    """
+    def __init__(self, model_name):
+
+        self.name = model_name
+        self.results = {}
+        self.pfiles = {}
+
+    def addFile(self, file_type, file_path):
+
+        if (file_type in RESULT_FILE_TYPES):
+            self.results[file_type] = file_path
+        elif (file_type in PROCESSING_FILE_TYPES):
+            self.pfiles[file_type] = file_path
+        else:
+            logging.error("{} not a valid file type. Check constants.py for valid types.".format(file_type))

@@ -13,12 +13,18 @@ def test_Hut_initialize_models():
     errors = []
     testhut = bb.Hut(config_file)
 
-    if testhut.models[0].name != "newModel1":
+    if testhut.models["newModel1"].name != "newModel1":
         errors.append("Error adding newModel1")
-    if testhut.models[1].name != "newModel2":
+    if testhut.models["newModel2"].name != "newModel2":
         errors.append("Error adding newModel2")
 
     assert not errors, "{}".format("\n".join(errors))
+
+def test_Hut_get_model_by_index():
+
+    testhut = bb.Hut(config_file)
+
+    assert testhut["newModel1"].name == "newModel1"
 
 # ---------------------------------------------------------------------------------------------------------------
 # Model class tests

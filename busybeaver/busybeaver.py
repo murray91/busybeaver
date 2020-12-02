@@ -14,10 +14,19 @@ class Hut:
     def __init__(self, config_file = None):
       
         self.config_file = config_file
-        self.models = []
+        self.models = {}
 
         if self.config_file != None:
             self.loadConfig(self.config_file)
+
+    # Allows returning model object by indexing the hut by with model name
+    #   e.g. model = myhut["modelname"]
+    #   (same as doing myhut.models["modelname"])
+
+    def __getitem__(self, indices):
+        # caution: no support for integer indices or slicing etc.
+        return self.models[indices]
+
 
     def loadConfig(self, config_file):
         """
@@ -33,7 +42,7 @@ class Hut:
         models = config.sections()[1:]
         for name in models:
             new_model = Model(name)
-            self.models.append(new_model)
+            self.models[name] = new_model
             logging.info("Created model for {}.".format(new_model.name))
         
 

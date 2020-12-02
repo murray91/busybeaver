@@ -1,4 +1,5 @@
 import busybeaver as bb
+from busybeaver.constants import *
 import os
 
 FILE_DIR = os.path.dirname(__file__)
@@ -65,3 +66,13 @@ def test_Model_add_processing_2():
     model.addFile(file_type, fake_path)
 
     assert not model.results and not model.pfiles, "Trouble adding processing file to Model object."
+
+# Tests for adding an operation to the model run stack
+# -----
+def test_Model_add_operation_to_run_stack():
+
+    testhut = bb.Hut(config_file)
+    operation = "ASC_TO_RASTER"
+    testhut["newModel1"].addOpx(operation)
+
+    assert testhut["newModel1"].runstack[0] == OPERATIONS["ASC_TO_RASTER"]

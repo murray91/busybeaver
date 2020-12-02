@@ -1,4 +1,4 @@
-# This file defines standard names for input files to be referenced in the config file
+from . import operations as opx
 
 # RESULT_FILES
 # Standardized names for MIKE model result files (suffixed with format)
@@ -14,4 +14,9 @@ RESULT_FILE_TYPES = {
 PROCESSING_FILE_TYPES = {
     "MODEL_BOUNDARY_POLYGON",       # Boundary to clip model results to
     "DEPTH_RIVER_MASK_POLYGON"      # Polygon areas to be removed from DEPTH_RIVER
+}
+
+# OPERATION NAMES LINKED TO FUNCTION
+OPERATIONS = {
+    "ASC_TO_RASTER" : opx.asc_to_raster,    # Converts asc file to raster
 }

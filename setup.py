@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="busybeaver", # Replace with your own username
-    version="0.0.3",
+    version="0.0.4",
     author="Ryan Murray",
     author_email="ryanwaltermurray@gmail.com",
     description="simplify post-processing of MIKE model results into GIS formats.",

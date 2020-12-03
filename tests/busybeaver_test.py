@@ -69,10 +69,39 @@ def test_Model_add_processing_2():
 
 # Tests for adding an operation to the model run stack
 # -----
-def test_Model_add_operation_to_run_stack():
+def test_Model_add_operation_to_run_stack1():
 
     testhut = bb.Hut(config_file)
     operation = "ASC_TO_RASTER"
-    testhut["newModel1"].addOpx(operation)
+    filename = "somefile.txt"
+    testhut["newModel1"].addOperation(operation, filename)
 
-    assert testhut["newModel1"].runstack[0] == OPERATIONS["ASC_TO_RASTER"]
+    assert OPERATIONS[testhut["newModel1"].runstack[0][0]] == OPERATIONS["ASC_TO_RASTER"]
+
+def test_Model_add_operation_to_run_stack2():
+
+    testhut = bb.Hut(config_file)
+    operation = "ASC_TO_RASTER"
+    filename = "somefile.txt"
+    another_param = "testing *args"
+    testhut["newModel1"].addOperation(operation, filename, another_param)
+
+    assert OPERATIONS[testhut["newModel1"].runstack[0][0]] == OPERATIONS["ASC_TO_RASTER"]
+
+def test_Model_add_operation_to_run_stack3():
+
+    testhut = bb.Hut(config_file)
+    operation = "ASC_TO_RASTER"
+    testhut["newModel1"].addOperation(operation)
+
+    assert OPERATIONS[testhut["newModel1"].runstack[0][0]] == OPERATIONS["ASC_TO_RASTER"]
+
+def test_Model_add_operation_to_run_stack4():
+
+    testhut = bb.Hut(config_file)
+    operation = "ASC_TO_RASTER"
+    filename = "somefile.txt"
+    another_param = "testing *args"
+    testhut["newModel1"].addOperation(operation, filename, another_param)
+
+    assert testhut["newModel1"].runstack[0][1] == ("somefile.txt", "testing *args")

@@ -72,9 +72,9 @@ class Model:
             logging.error("{} not a valid file type. Check constants.py for valid types.".format(file_type))
 
     # NOTE: Need to add a way for operations to accept arguments
-    def addOpx(self, operation):
+    def addOperation(self, operation, *args):
 
         if (operation in OPERATIONS):
-            self.runstack.append(OPERATIONS[operation])
+            self.runstack.append([operation, args])
         else:
             logging.error("{} not a valid operation type. Check constants.py for valid types.".format(operation))

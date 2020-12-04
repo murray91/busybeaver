@@ -14,9 +14,9 @@ def test_Hut_initialize_models():
     errors = []
     testhut = bb.Hut(config_file)
 
-    if testhut.models["newModel1"].name != "newModel1":
+    if testhut.models[0].name != "newModel1":
         errors.append("Error adding newModel1")
-    if testhut.models["newModel2"].name != "newModel2":
+    if testhut.models[1].name != "newModel2":
         errors.append("Error adding newModel2")
 
     assert not errors, "{}".format("\n".join(errors))
@@ -24,8 +24,34 @@ def test_Hut_initialize_models():
 def test_Hut_get_model_by_index():
 
     testhut = bb.Hut(config_file)
-
     assert testhut["newModel1"].name == "newModel1"
+
+def test_Hut_get_model_by_index2():
+
+    testhut = bb.Hut(config_file)
+    assert testhut.models[1].name == "newModel2"
+
+def test_Hut_length_magic():
+    testhut = bb.Hut(config_file)
+    assert len(testhut) == len(testhut.models)
+
+def test_Hut_model_iteration():
+    testhut = bb.Hut(config_file)
+    result = 0
+    for model in testhut:
+        result += 1
+    assert result == len(testhut)
+
+def test_Hut_model_iteration2():
+    errors = []
+    testhut = bb.Hut(config_file)
+    index = 0
+    for model in testhut:
+        if not (model.name == testhut.models[index].name):
+            errors.append("Error in interation.")
+        index += 1
+
+    assert not errors, "{}".format("\n".join(errors))
 
 # ---------------------------------------------------------------------------------------------------------------
 # Model class tests

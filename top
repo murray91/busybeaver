@@ -1,0 +1,59 @@
+[33mcommit e380e8cf05c72f4970589e766e77dd017e8bbb0e[m[33m ([m[1;36mHEAD -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m
+Author: murray91 <ryanwaltermurray@gmail.com>
+Date:   Fri Dec 4 00:18:40 2020 +0100
+
+    publish new version
+
+[33mcommit f1a6ac87725814a1998f96cad14228c625098699[m
+Author: murray91 <ryanwaltermurray@gmail.com>
+Date:   Fri Dec 4 00:16:40 2020 +0100
+
+    update addOperation and tests
+
+[33mcommit df83d58f3d89e05370001a747061064dcb7ce075[m
+Author: murray91 <ryanwaltermurray@gmail.com>
+Date:   Thu Dec 3 00:47:39 2020 +0100
+
+    building operations functionality
+
+[33mcommit d0219d469f9f6555a34ccd5d38cb3cfbc671e7dd[m
+Author: murray91 <ryanwaltermurray@gmail.com>
+Date:   Wed Dec 2 22:36:19 2020 +0100
+
+    add hut object indicing
+
+[33mcommit 7d6f9d98d751a36e3a5a3b65c670b85a91dca79b[m
+Author: murray91 <ryanwaltermurray@gmail.com>
+Date:   Wed Dec 2 01:26:14 2020 +0100
+
+    add Model class, incomplete
+
+[33mcommit 915f4806c9819abfe8b1deeef943597d4dff1a69[m
+Author: murray91 <ryanwaltermurray@gmail.com>
+Date:   Mon Nov 30 00:38:34 2020 +0100
+
+    fix test
+
+[33mcommit 33cd4e69d4f1541635d5407e897ef0d96e6e262c[m
+Author: murray91 <ryanwaltermurray@gmail.com>
+Date:   Mon Nov 30 00:27:30 2020 +0100
+
+    fixed .gitignore
+
+[33mcommit 806eb3dc640011fd7769adef33acf323167aad1c[m
+Author: murray91 <ryanwaltermurray@gmail.com>
+Date:   Mon Nov 30 00:26:38 2020 +0100
+
+    started hut module import config file
+
+[33mcommit cd9b239097eeae9ff9e164f8af8ba7ce371798e3[m
+Author: murray91 <74630349+murray91@users.noreply.github.com>
+Date:   Sun Nov 29 19:55:52 2020 +0100
+
+    updated project structure
+
+[33mcommit 8cd62df3f79e503c6e48a977b208d79667b8c09b[m
+Author: murray91 <74630349+murray91@users.noreply.github.com>
+Date:   Sun Nov 29 00:31:34 2020 +0100
+
+    fresh start

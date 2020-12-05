@@ -18,5 +18,12 @@ PROCESSING_FILE_TYPES = {
 
 # OPERATION NAMES LINKED TO FUNCTION
 OPERATIONS = {
-    "ASC_TO_RASTER" : opx.asc_to_raster,    # Converts asc file to raster
+    "process2DDepth" : opx.TEMPORARY,           # add descriptions   
+    "process2DVelocity" : opx.TEMPORARY,    
+    "process2DDirection" : opx.TEMPORARY,     
+    "processRiverDepth" : opx.TEMPORARY,     
+    "processFullDepth" : opx.TEMPORARY,     
+    "processClipDepth" : opx.TEMPORARY,     
+    "processClipVelocity" : opx.TEMPORARY,     
+    "processClean" : opx.TEMPORARY,     
 }

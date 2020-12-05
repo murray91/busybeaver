@@ -45,6 +45,8 @@ class Hut:
         """
         Loads a configuration .ini file into the hut.
         """
+        # Delete any old models
+        self.models = []
 
         # Read the config file
         logging.info("Reading config file.")
@@ -57,6 +59,18 @@ class Hut:
             new_model = Model(name)
             self.models.append(new_model)
             logging.info("Created model for {}.".format(new_model.name))
+
+        # Import filenames / operations
+        for model in self.models:
+            attributes = config.items(model.name)
+            for a in attributes:
+                if a in RESULT_FILE_TYPES:
+                    model.addFile(*a)
+                elif a in PROCESSING_FILE_TYPES:
+                    model.addFile(*a)
+                elif a in OPERATIONS and a[1]:
+                    model.addOperation(a[0])
+
 
 # Allows iterating over Hut to get models      
 class HutIterator:

@@ -1,2 +1,2 @@
-def asc_to_raster(asc_file):
+def TEMPORARY(asc_file):
     return "TEST"

@@ -9,7 +9,8 @@ config_file = os.path.join(FILE_DIR, r"data\test_config.ini")
 # Hut class tests
 # ---------------------------------------------------------------------------------------------------------------
 
-# Test hut initialization of models from config file
+# Tests initializing models
+# -----
 def test_Hut_initialize_models():
     errors = []
     testhut = bb.Hut(config_file)
@@ -20,6 +21,9 @@ def test_Hut_initialize_models():
         errors.append("Error adding newModel2")
 
     assert not errors, "{}".format("\n".join(errors))
+
+# Tests Hut class magic functions
+# -----
 
 def test_Hut_get_model_by_index():
 
@@ -48,10 +52,16 @@ def test_Hut_model_iteration2():
     index = 0
     for model in testhut:
         if not (model.name == testhut.models[index].name):
-            errors.append("Error in interation.")
+            errors.append("Error in iteration.")
         index += 1
 
     assert not errors, "{}".format("\n".join(errors))
+
+# Tests loading config file attributes
+# -----
+
+# TO DO: CREATE TEST FOR ADDING OPERATIONS AND DIFFERENT FILE TYPES
+
 
 # ---------------------------------------------------------------------------------------------------------------
 # Model class tests
@@ -98,34 +108,34 @@ def test_Model_add_processing_2():
 def test_Model_add_operation_to_run_stack1():
 
     testhut = bb.Hut(config_file)
-    operation = "ASC_TO_RASTER"
+    operation = "process2DDepth"
     filename = "somefile.txt"
     testhut["newModel1"].addOperation(operation, filename)
 
-    assert OPERATIONS[testhut["newModel1"].runstack[0][0]] == OPERATIONS["ASC_TO_RASTER"]
+    assert OPERATIONS[testhut["newModel1"].runstack[0][0]] == OPERATIONS["process2DDepth"]
 
 def test_Model_add_operation_to_run_stack2():
 
     testhut = bb.Hut(config_file)
-    operation = "ASC_TO_RASTER"
+    operation = "process2DDepth"
     filename = "somefile.txt"
     another_param = "testing *args"
     testhut["newModel1"].addOperation(operation, filename, another_param)
 
-    assert OPERATIONS[testhut["newModel1"].runstack[0][0]] == OPERATIONS["ASC_TO_RASTER"]
+    assert OPERATIONS[testhut["newModel1"].runstack[0][0]] == OPERATIONS["process2DDepth"]
 
 def test_Model_add_operation_to_run_stack3():
 
     testhut = bb.Hut(config_file)
-    operation = "ASC_TO_RASTER"
+    operation = "process2DDepth"
     testhut["newModel1"].addOperation(operation)
 
-    assert OPERATIONS[testhut["newModel1"].runstack[0][0]] == OPERATIONS["ASC_TO_RASTER"]
+    assert OPERATIONS[testhut["newModel1"].runstack[0][0]] == OPERATIONS["process2DDepth"]
 
 def test_Model_add_operation_to_run_stack4():
 
     testhut = bb.Hut(config_file)
-    operation = "ASC_TO_RASTER"
+    operation = "process2DDepth"
     filename = "somefile.txt"
     another_param = "testing *args"
     testhut["newModel1"].addOperation(operation, filename, another_param)

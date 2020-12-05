@@ -68,7 +68,7 @@ class Hut:
                     model.addFile(*a)
                 elif a in PROCESSING_FILE_TYPES:
                     model.addFile(*a)
-                elif a in OPERATIONS and a[1]:
+                elif a in OPERATIONS and a[1] == "True":
                     model.addOperation(a[0])
 
 

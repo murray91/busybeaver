@@ -61,43 +61,47 @@ def test_Hut_model_iteration2():
 # Tests config file parsing
 # -----
 def test_Config_parsing1():
-    config = configparser.ConfigParser()
+    config = configparser.RawConfigParser()
+    config.optionxform=str
     config.read(config_file)
     models = config.sections()[1:]
     assert models[0] == "newModel1"
 
 def test_Config_parsing2():
-    config = configparser.ConfigParser()
+    config = configparser.RawConfigParser()
+    config.optionxform=str
     config.read(config_file)
     models = config.sections()[1:]
     assert models[1] == "newModel2"
 
 def test_Config_parsing3():
-    config = configparser.ConfigParser()
+    config = configparser.RawConfigParser()
+    config.optionxform=str
     config.read(config_file)
     models = config.sections()[1:]
     attributes = config.items(models[0])
     assert attributes[0][0] == "includeInProcessing"
 
 def test_Config_parsing3():
-    config = configparser.ConfigParser()
+    config = configparser.RawConfigParser()
+    config.optionxform=str
     config.read(config_file)
     models = config.sections()[1:]
     attributes = config.items(models[0])
     assert attributes[0][1] == "True"
 
 def test_Config_parsing4():
-    config = configparser.ConfigParser()
+    config = configparser.RawConfigParser()
+    config.optionxform=str
     config.read(config_file)
     models = config.sections()[1:]
     attributes = config.items(models[0])
-    assert attributes[8][0] in OPERATIONS
+    assert attributes[9][0] in OPERATIONS
 
 # Tests loading config file attributes
 # -----
 
 def test_Hut_load_config_operations1():
-    errors = []
     testhut = bb.Hut(config_file)
     model = testhut["newModel1"]
     
@@ -122,10 +126,60 @@ def test_Hut_load_config_operations2():
         errors.append("Error adding process2DDirection operation.")
     if not "processFullDepth" in op_names:
         errors.append("Error adding processFullDepth operation.")
-    if not "processClean" in op_names:
+    if not "processClipVelocity" in op_names:
         errors.append("Error adding processClean operation.")
 
-    assert not errors, "{}".format("\n".join(errors))   
+    assert not errors, "{}".format("\n".join(errors))
+
+def test_Hut_load_config_operations3():
+    testhut = bb.Hut(config_file)
+    model = testhut["newModel1"]
+    
+    op_names = []
+    for operation in model.runstack:
+        op_names.append(operation[0])
+
+    assert "process2DVelocity" not in op_names
+
+def test_Hut_load_config_result_files1():
+    testhut = bb.Hut(config_file)
+    model = testhut["newModel1"]
+    
+    res_names = []
+    for result in model.results:
+        res_names.append(result)
+
+    assert "DEPTH_2D_ASC" in res_names
+
+def test_Hut_load_config_result_files2():
+    testhut = bb.Hut(config_file)
+    model = testhut["newModel1"]
+    
+    res_names = []
+    for result in model.results:
+        res_names.append(result)
+
+    assert "MODEL_BOUNDARY_POLYGON" not in res_names
+
+def test_Hut_load_config_process_files1():
+    testhut = bb.Hut(config_file)
+    model = testhut["newModel1"]
+    
+    res_names = []
+    for result in model.pfiles:
+        res_names.append(result)
+
+    assert "MODEL_BOUNDARY_POLYGON" in res_names
+
+def test_Hut_load_config_process_files2():
+    testhut = bb.Hut(config_file)
+    model = testhut["newModel1"]
+    
+    res_names = []
+    for result in model.pfiles:
+        res_names.append(result)
+
+    assert "DEPTH_2D_ASC" not in res_names 
 
 # ---------------------------------------------------------------------------------------------------------------
 # Model class tests
@@ -203,5 +257,6 @@ def test_Model_add_operation_to_run_stack4():
     filename = "somefile.txt"
     another_param = "testing *args"
     testhut["newModel1"].addOperation(operation, filename, another_param)
+    id = len(testhut["newModel1"].runstack)
 
-    assert testhut["newModel1"].runstack[0][1] == ("somefile.txt", "testing *args")
+    assert testhut["newModel1"].runstack[id-1][1] == ("somefile.txt", "testing *args")

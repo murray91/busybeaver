@@ -50,7 +50,8 @@ class Hut:
 
         # Read the config file
         logging.info("Reading config file.")
-        config = configparser.ConfigParser()
+        config = configparser.RawConfigParser()
+        config.optionxform=str
         config.read(self.config_file)
 
         # Create empty Model objects for each model
@@ -64,11 +65,11 @@ class Hut:
         for model in self.models:
             attributes = config.items(model.name)
             for a in attributes:
-                if a in RESULT_FILE_TYPES:
+                if a[0] in RESULT_FILE_TYPES:
                     model.addFile(*a)
-                elif a in PROCESSING_FILE_TYPES:
+                elif a[0] in PROCESSING_FILE_TYPES:
                     model.addFile(*a)
-                elif a in OPERATIONS and a[1] == "True":
+                elif a[0] in OPERATIONS and a[1] == "True":
                     model.addOperation(a[0])
 
 

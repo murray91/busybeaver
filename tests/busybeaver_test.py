@@ -101,6 +101,14 @@ def test_Config_parsing4():
 # Tests loading config file attributes
 # -----
 
+def test_Hut_load_config_setup1():
+    testhut = bb.Hut(config_file)
+    assert testhut.output_folder == "PATH"
+
+def test_Hut_load_config_setup2():
+    testhut = bb.Hut(config_file)
+    assert testhut.crs == "CRS"
+
 def test_Hut_load_config_operations1():
     testhut = bb.Hut(config_file)
     model = testhut["newModel1"]

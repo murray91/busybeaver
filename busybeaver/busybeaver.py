@@ -2,6 +2,7 @@ import configparser
 import logging
 from .constants import *
 import collections
+import os
 
 logging.basicConfig(filename='bb.log', level=logging.DEBUG)
 
@@ -16,6 +17,8 @@ class Hut:
       
         self.config_file = config_file
         self.models = []
+        self.output_folder = os.getcwd()
+        self.crs = None
 
         if self.config_file != None:
             self.loadConfig(self.config_file)
@@ -58,6 +61,11 @@ class Hut:
         config.optionxform=str
         config.read(self.config_file)
 
+        # Load general results
+        logging.info("Applying general hut settings...")
+        self.output_folder = config.get("setup", "default_output_path")
+        self.crs = config.get("setup", "crs")
+
         # Create empty Model objects for each model
         logging.info("Adding models to hut...")
         models = config.sections()[1:]
@@ -80,6 +88,36 @@ class Hut:
         
         logging.info("Config file loaded.")
 
+    # Allows saving the hut configuration to a new config file
+    def saveConfig(self, new_file_path):
+
+        logging.info("Saving hut to new config file...")
+        parser = configparser.RawConfigParser()
+        parser.optionxform = str
+
+        logging.debug("Saving setup attributes.")
+        parser.add_section("setup")
+        parser.set("setup", "default_output_path", self.output_folder)
+        parser.set("setup", "crs", self.crs)
+
+        for model in self.models:
+            parser.add_section(model.name)
+            for result_type, result_path in model.results.items():
+                parser.set(model.name, result_type, result_path)
+                logging.debug("Saving attribute {} for {} as {}".format(result_type, model.name, result_path))
+            for processing_type, processing_path in model.pfiles.items():
+                parser.set(model.name, processing_type, processing_path)
+                logging.debug("Saving attribute {} for {} as {}".format(processing_type, model.name, processing_path))
+            for operation in model.runstack:
+                parser.set(model.name, operation[0], "True")
+                logging.debug("Saving attribute {} for {} as {}".format(operation[0], model.name, "True"))
+        logging.info("New configuration saved in memory, now writing to file...")
+
+        f = open(new_file_path, "w")
+        parser.write(f)
+        f.close()
+
+        logging.info("Saved configuration to file.")
 
 # Allows iterating over Hut to get models      
 class HutIterator:
@@ -117,10 +155,10 @@ class Model:
 
         if (file_type in RESULT_FILE_TYPES):
             self.results[file_type] = file_path
-            logging.info("Added result file: ".format(file_type))
+            logging.debug("Added result file to {}: {}".format(self.name, file_type))
         elif (file_type in PROCESSING_FILE_TYPES):
             self.pfiles[file_type] = file_path
-            logging.info("Added processing file: ".format(file_type))
+            logging.debug("Added processing file to {}: {}".format(self.name, file_type))
         else:
             logging.error("{} not a valid file type. Check constants.py for valid types.".format(file_type))
 
@@ -129,6 +167,6 @@ class Model:
 
         if (operation in OPERATIONS):
             self.runstack.append([operation, args])
-            logging.info("Added operation to runstack: ".format(operation))
+            logging.debug("Added operation to runstack of {}: {}".format(self.name, operation))
         else:
             logging.error("{} not a valid operation type. Check constants.py for valid types.".format(operation))

@@ -1,60 +1,61 @@
 INFO:root:Loading config file...
 INFO:root:Reading config file.
+INFO:root:Applying general hut settings...
 INFO:root:Adding models to hut...
 INFO:root:Created model for newModel1.
 INFO:root:Added newModel1 to hut.
 INFO:root:Created model for newModel2.
 INFO:root:Added newModel2 to hut.
 INFO:root:Importing files and operations into hut models...
-INFO:root:Added result file to newModel1: DEPTH_2D_ASC
-INFO:root:Added result file to newModel1: VELOCITY_2D_ASC
-INFO:root:Added result file to newModel1: DEPTH_RIVER_ASC
-INFO:root:Added result file to newModel1: DIRECTION_2D_ASC
-INFO:root:Added processing file to newModel1: DEPTH_RIVER_MASK_POLYGON
-INFO:root:Added processing file to newModel1: MODEL_BOUNDARY_POLYGON
-INFO:root:Added operation to runstack of newModel1: process2DDepth
-INFO:root:Added operation to runstack of newModel1: process2DDirection
-INFO:root:Added operation to runstack of newModel1: processFullDepth
-INFO:root:Added operation to runstack of newModel1: processClipVelocity
-INFO:root:Added result file to newModel2: DEPTH_2D_ASC
-INFO:root:Added result file to newModel2: VELOCITY_2D_ASC
-INFO:root:Added result file to newModel2: DEPTH_RIVER_ASC
-INFO:root:Added result file to newModel2: DIRECTION_2D_ASC
-INFO:root:Added processing file to newModel2: DEPTH_RIVER_MASK_POLYGON
-INFO:root:Added processing file to newModel2: MODEL_BOUNDARY_POLYGON
-INFO:root:Added operation to runstack of newModel2: process2DDepth
-INFO:root:Added operation to runstack of newModel2: process2DVelocity
-INFO:root:Added operation to runstack of newModel2: process2DDirection
-INFO:root:Added operation to runstack of newModel2: processRiverDepth
-INFO:root:Added operation to runstack of newModel2: processFullDepth
-INFO:root:Added operation to runstack of newModel2: processClipDepth
-INFO:root:Added operation to runstack of newModel2: processClipVelocity
-INFO:root:Added operation to runstack of newModel2: processClean
+DEBUG:root:Added result file to newModel1: DEPTH_2D_ASC
+DEBUG:root:Added result file to newModel1: VELOCITY_2D_ASC
+DEBUG:root:Added result file to newModel1: DEPTH_RIVER_ASC
+DEBUG:root:Added result file to newModel1: DIRECTION_2D_ASC
+DEBUG:root:Added processing file to newModel1: DEPTH_RIVER_MASK_POLYGON
+DEBUG:root:Added processing file to newModel1: MODEL_BOUNDARY_POLYGON
+DEBUG:root:Added operation to runstack of newModel1: process2DDepth
+DEBUG:root:Added operation to runstack of newModel1: process2DDirection
+DEBUG:root:Added operation to runstack of newModel1: processFullDepth
+DEBUG:root:Added operation to runstack of newModel1: processClipVelocity
+DEBUG:root:Added result file to newModel2: DEPTH_2D_ASC
+DEBUG:root:Added result file to newModel2: VELOCITY_2D_ASC
+DEBUG:root:Added result file to newModel2: DEPTH_RIVER_ASC
+DEBUG:root:Added result file to newModel2: DIRECTION_2D_ASC
+DEBUG:root:Added processing file to newModel2: DEPTH_RIVER_MASK_POLYGON
+DEBUG:root:Added processing file to newModel2: MODEL_BOUNDARY_POLYGON
+DEBUG:root:Added operation to runstack of newModel2: process2DDepth
+DEBUG:root:Added operation to runstack of newModel2: process2DVelocity
+DEBUG:root:Added operation to runstack of newModel2: process2DDirection
+DEBUG:root:Added operation to runstack of newModel2: processRiverDepth
+DEBUG:root:Added operation to runstack of newModel2: processFullDepth
+DEBUG:root:Added operation to runstack of newModel2: processClipDepth
+DEBUG:root:Added operation to runstack of newModel2: processClipVelocity
+DEBUG:root:Added operation to runstack of newModel2: processClean
 INFO:root:Config file loaded.
 INFO:root:Saving hut to new config file...
-DEBUG:root:Saving attribute DEPTH_2D_ASC as PATH
-DEBUG:root:Saving attribute VELOCITY_2D_ASC as PATH
-DEBUG:root:Saving attribute DEPTH_RIVER_ASC as PATH
-DEBUG:root:Saving attribute DIRECTION_2D_ASC as PATH
-DEBUG:root:Saving attribute DEPTH_RIVER_MASK_POLYGON as PATH
-DEBUG:root:Saving attribute MODEL_BOUNDARY_POLYGON as PATH
-DEBUG:root:Saving attribute process2DDepth as True
-DEBUG:root:Saving attribute process2DDirection as True
-DEBUG:root:Saving attribute processFullDepth as True
-DEBUG:root:Saving attribute processClipVelocity as True
-DEBUG:root:Saving attribute DEPTH_2D_ASC as PATH
-DEBUG:root:Saving attribute VELOCITY_2D_ASC as PATH
-DEBUG:root:Saving attribute DEPTH_RIVER_ASC as PATH
-DEBUG:root:Saving attribute DIRECTION_2D_ASC as PATH
-DEBUG:root:Saving attribute DEPTH_RIVER_MASK_POLYGON as PATH
-DEBUG:root:Saving attribute MODEL_BOUNDARY_POLYGON as PATH
-DEBUG:root:Saving attribute process2DDepth as True
-DEBUG:root:Saving attribute process2DVelocity as True
-DEBUG:root:Saving attribute process2DDirection as True
-DEBUG:root:Saving attribute processRiverDepth as True
-DEBUG:root:Saving attribute processFullDepth as True
-DEBUG:root:Saving attribute processClipDepth as True
-DEBUG:root:Saving attribute processClipVelocity as True
-DEBUG:root:Saving attribute processClean as True
+DEBUG:root:Saving attribute DEPTH_2D_ASC for newModel1 as PATH
+DEBUG:root:Saving attribute VELOCITY_2D_ASC for newModel1 as PATH
+DEBUG:root:Saving attribute DEPTH_RIVER_ASC for newModel1 as PATH
+DEBUG:root:Saving attribute DIRECTION_2D_ASC for newModel1 as PATH
+DEBUG:root:Saving attribute DEPTH_RIVER_MASK_POLYGON for newModel1 as PATH
+DEBUG:root:Saving attribute MODEL_BOUNDARY_POLYGON for newModel1 as PATH
+DEBUG:root:Saving attribute process2DDepth for newModel1 as True
+DEBUG:root:Saving attribute process2DDirection for newModel1 as True
+DEBUG:root:Saving attribute processFullDepth for newModel1 as True
+DEBUG:root:Saving attribute processClipVelocity for newModel1 as True
+DEBUG:root:Saving attribute DEPTH_2D_ASC for newModel2 as PATH
+DEBUG:root:Saving attribute VELOCITY_2D_ASC for newModel2 as PATH
+DEBUG:root:Saving attribute DEPTH_RIVER_ASC for newModel2 as PATH
+DEBUG:root:Saving attribute DIRECTION_2D_ASC for newModel2 as PATH
+DEBUG:root:Saving attribute DEPTH_RIVER_MASK_POLYGON for newModel2 as PATH
+DEBUG:root:Saving attribute MODEL_BOUNDARY_POLYGON for newModel2 as PATH
+DEBUG:root:Saving attribute process2DDepth for newModel2 as True
+DEBUG:root:Saving attribute process2DVelocity for newModel2 as True
+DEBUG:root:Saving attribute process2DDirection for newModel2 as True
+DEBUG:root:Saving attribute processRiverDepth for newModel2 as True
+DEBUG:root:Saving attribute processFullDepth for newModel2 as True
+DEBUG:root:Saving attribute processClipDepth for newModel2 as True
+DEBUG:root:Saving attribute processClipVelocity for newModel2 as True
+DEBUG:root:Saving attribute processClean for newModel2 as True
 INFO:root:New configuration saved in memory, now writing to file...
 INFO:root:Saved configuration to file.

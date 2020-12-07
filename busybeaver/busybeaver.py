@@ -84,7 +84,7 @@ class Hut:
                 elif a[0] in PROCESSING_FILE_TYPES:
                     model.addFile(*a)
                 elif a[0] in OPERATIONS and a[1] == "True":
-                    model.addOperation(a[0])
+                    model.addPredefinedOperation(a[0])
         
         logging.info("Config file loaded.")
 
@@ -147,6 +147,8 @@ class Model:
         self.name = model_name
         self.results = {}
         self.pfiles = {}
+
+        # Stores operations to be run as a list of lists, inner list format is [function_name, args]
         self.runstack = []
 
         logging.info("Created model for {}.".format(self.name))
@@ -162,11 +164,32 @@ class Model:
         else:
             logging.error("{} not a valid file type. Check constants.py for valid types.".format(file_type))
 
-    # NOTE: Need to add a way for operations to accept arguments
-    def addOperation(self, operation, *args):
+    # Returns the file path of a file type in self.results or self.pfiles
+    def getFile(self, file_type):
+        if file_type in self.results:
+            return self.results[file_type]
+        elif file_type in self.pfiles:
+            return self.pfiles[file_type]
+        else:
+            logging.error("Could not find file type {} in model {}.".format(file_type, self.name))
+            return None
 
-        if (operation in OPERATIONS):
-            self.runstack.append([operation, args])
-            logging.debug("Added operation to runstack of {}: {}".format(self.name, operation))
+    # Adds a raw python function and arguments to runstack
+    def addOperation(self, operation, *args):
+        self.runstack.append(["CUSTOM_OPERATION", operation, *args])
+        logging.debug("Added operation to runstack of {}: {}".format(self.name, operation))
+
+    # Adds a function in OPERATIONS to runstack, auto-filling arguments
+    def addPredefinedOperation(self, operation):
+        if operation in OPERATIONS:
+            args = []
+            for arg in OPERATIONS[operation][1:]:
+                args.append(self.getFile(arg))
+            if None in args:
+                logging.error("Input file for operation {} in model {} missing.".format(operation,self.name))
+            self.runstack.append([operation, OPERATIONS[operation][0], *args])
         else:
             logging.error("{} not a valid operation type. Check constants.py for valid types.".format(operation))
+
+    def run(self, runstack_id):
+        return self.runstack[runstack_id][1](*self.runstack[runstack_id][2:])

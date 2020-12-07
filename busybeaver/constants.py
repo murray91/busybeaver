@@ -16,14 +16,18 @@ PROCESSING_FILE_TYPES = {
     "DEPTH_RIVER_MASK_POLYGON"      # Polygon areas to be removed from DEPTH_RIVER
 }
 
-# OPERATION NAMES LINKED TO FUNCTION
+# OPERATION NAMES LINKED TO FUNCTION AND FILE_TYPES
+# Should be a list in the form of [function reference, arg1, arg2, etc.]
+# See operations.py for descriptions of each function
+
 OPERATIONS = {
-    "process2DDepth" : opx.TEMPORARY,           # add descriptions   
-    "process2DVelocity" : opx.TEMPORARY,    
-    "process2DDirection" : opx.TEMPORARY,     
-    "processRiverDepth" : opx.TEMPORARY,     
-    "processFullDepth" : opx.TEMPORARY,     
-    "processClipDepth" : opx.TEMPORARY,     
-    "processClipVelocity" : opx.TEMPORARY,     
-    "processClean" : opx.TEMPORARY,     
+    "process2DDepth" : [opx.TEMPORARY, "DEPTH_2D_ASC"],        
+    "process2DVelocity" : [opx.TEMPORARY, "DEPTH_2D_ASC"],      
+    "process2DDirection" : [opx.TEMPORARY, "DEPTH_2D_ASC"],     
+    "processRiverDepth" : [opx.TEMPORARY, "DEPTH_2D_ASC"],    
+    "processFullDepth" : [opx.TEMPORARY, "DEPTH_2D_ASC"],    
+    "processClipDepth" : [opx.TEMPORARY, "DEPTH_2D_ASC"],      
+    "processClipVelocity" : [opx.TEMPORARY, "DEPTH_2D_ASC"],      
+    "processClean" : [opx.TEMPORARY, "DEPTH_2D_ASC"],
+    "OP_FOR_TESTING_ONLY" : [opx.FOR_TESTING_ONLY, "DEPTH_2D_ASC", "MODEL_BOUNDARY_POLYGON"]
 }

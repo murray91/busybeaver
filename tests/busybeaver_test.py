@@ -82,7 +82,7 @@ def test_Config_parsing3():
     attributes = config.items(models[0])
     assert attributes[0][0] == "includeInProcessing"
 
-def test_Config_parsing3():
+def test_Config_parsing4():
     config = configparser.RawConfigParser()
     config.optionxform=str
     config.read(config_file)
@@ -90,7 +90,7 @@ def test_Config_parsing3():
     attributes = config.items(models[0])
     assert attributes[0][1] == "True"
 
-def test_Config_parsing4():
+def test_Config_parsing5():
     config = configparser.RawConfigParser()
     config.optionxform=str
     config.read(config_file)

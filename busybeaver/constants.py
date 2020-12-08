@@ -21,13 +21,13 @@ PROCESSING_FILE_TYPES = {
 # See operations.py for descriptions of each function
 
 OPERATIONS = {
-    "process2DDepth" : [opx.TEMPORARY, "DEPTH_2D_ASC"],        
-    "process2DVelocity" : [opx.TEMPORARY, "DEPTH_2D_ASC"],      
-    "process2DDirection" : [opx.TEMPORARY, "DEPTH_2D_ASC"],     
-    "processRiverDepth" : [opx.TEMPORARY, "DEPTH_2D_ASC"],    
-    "processFullDepth" : [opx.TEMPORARY, "DEPTH_2D_ASC"],    
-    "processClipDepth" : [opx.TEMPORARY, "DEPTH_2D_ASC"],      
-    "processClipVelocity" : [opx.TEMPORARY, "DEPTH_2D_ASC"],      
-    "processClean" : [opx.TEMPORARY, "DEPTH_2D_ASC"],
+    "process2DDepth" : [opx.process2DDepth, "DEPTH_2D_ASC"],        
+    "process2DVelocity" : [opx.process2DVelocity, "DEPTH_2D_ASC"],      
+    "process2DDirection" : [opx.process2DDirection, "DEPTH_2D_ASC"],     
+    "processRiverDepth" : [opx.processRiverDepth, "DEPTH_2D_ASC"],    
+    "processFullDepth" : [opx.processFullDepth, "DEPTH_2D_ASC"],    
+    "processClipDepth" : [opx.processClipDepth, "DEPTH_2D_ASC"],      
+    "processClipVelocity" : [opx.processClipVelocity, "DEPTH_2D_ASC"],      
+    "processClean" : [opx.processClean, "DEPTH_2D_ASC"],
     "OP_FOR_TESTING_ONLY" : [opx.FOR_TESTING_ONLY, "DEPTH_2D_ASC", "MODEL_BOUNDARY_POLYGON"]
 }

@@ -164,16 +164,6 @@ class Model:
         else:
             logging.error("{} not a valid file type. Check constants.py for valid types.".format(file_type))
 
-    # Returns the file path of a file type in self.results or self.pfiles
-    def getFile(self, file_type):
-        if file_type in self.results:
-            return self.results[file_type]
-        elif file_type in self.pfiles:
-            return self.pfiles[file_type]
-        else:
-            logging.error("Could not find file type {} in model {}.".format(file_type, self.name))
-            return None
-
     # Adds a raw python function and arguments to runstack
     def addOperation(self, func, *args):
         self.runstack.append(Operation("CUSTOM_OPERATION", func, *args))
@@ -190,6 +180,16 @@ class Model:
             self.runstack.append(Operation(operation_name, OPERATIONS[operation_name][0], *args))
         else:
             logging.error("{} not a valid operation type. Check constants.py for valid types.".format(operation_name))
+
+    # Returns the file path of a file type in self.results or self.pfiles
+    def getFile(self, file_type):
+        if file_type in self.results:
+            return self.results[file_type]
+        elif file_type in self.pfiles:
+            return self.pfiles[file_type]
+        else:
+            logging.error("Could not find file type {} in model {}.".format(file_type, self.name))
+            return None
 
 class Operation:
     """

@@ -115,7 +115,7 @@ def test_Hut_load_config_operations1():
     
     funcs = []
     for operation in model.runstack:
-        funcs.append(operation[1])
+        funcs.append(operation.func)
 
     assert OPERATIONS["process2DDepth"][0] in funcs
 
@@ -126,7 +126,7 @@ def test_Hut_load_config_operations2():
     
     funcs = []
     for operation in model.runstack:
-        funcs.append(operation[0])
+        funcs.append(operation.name)
 
     if not "process2DDepth" in funcs:
         errors.append("Error adding process2DDepth operation.")
@@ -145,7 +145,7 @@ def test_Hut_load_config_operations3():
     
     op_names = []
     for operation in model.runstack:
-        op_names.append(operation[0])
+        op_names.append(operation.name)
 
     assert "process2DVelocity" not in op_names
 
@@ -239,7 +239,7 @@ def test_Model_add_operation_to_run_stack1():
     operation = "process2DDepth"
     testhut["newModel1"].addPredefinedOperation(operation)
 
-    assert testhut["newModel1"].runstack[0][0] == "process2DDepth"
+    assert testhut["newModel1"].runstack[0].name == "process2DDepth"
 
 def test_Model_add_operation_to_run_stack2():
 
@@ -247,7 +247,7 @@ def test_Model_add_operation_to_run_stack2():
     operation = "process2DDepth"
     testhut["newModel1"].addPredefinedOperation(operation)
 
-    assert testhut["newModel1"].runstack[0][1] == OPERATIONS["process2DDepth"][0]
+    assert testhut["newModel1"].runstack[0].func == OPERATIONS["process2DDepth"][0]
 
 def test_Model_add_operation_to_run_stack4():
 
@@ -255,7 +255,7 @@ def test_Model_add_operation_to_run_stack4():
     testhut = bb.Hut(config_file)
     model = testhut["newModel1"]
     for i in model.runstack:
-        if not callable(i[1]):
+        if not callable(i.func):
             errors.append("Runstack function not callable.")
 
     assert not errors, "{}".format("\n".join(errors))
@@ -264,7 +264,7 @@ def test_Model_add_operation_to_run_stack5():
 
     testhut = bb.Hut(config_file)
     model = testhut["newModel1"]
-    assert model.runstack[0] == ["process2DDepth", OPERATIONS["process2DDepth"][0], "Some path to asc file."]
+    assert model.runstack[0].args[0] == "Some path to asc file."
 
 def test_Model_add_operation_to_run_stack6():
 
@@ -272,7 +272,7 @@ def test_Model_add_operation_to_run_stack6():
     model = testhut["newModel1"]
     model.addPredefinedOperation("OP_FOR_TESTING_ONLY")
     expected_result = [model.results["DEPTH_2D_ASC"], model.pfiles["MODEL_BOUNDARY_POLYGON"]]
-    assert expected_result == model.run(len(model.runstack)-1)
+    assert expected_result == model.runstack[len(model.runstack)-1].run()
 
 def test_Model_add_custom_operation1():
 
@@ -285,4 +285,33 @@ def test_Model_add_custom_operation1():
     myargs = "it works!"
     my_cust_opx = myfunct
     model.addOperation(my_cust_opx, myargs)
-    assert model.run(len(model.runstack)-1) == "it works!"
+    assert model.runstack[len(model.runstack)-1].run() == "it works!"
+
+# ---------------------------------------------------------------------------------------------------------------
+# Operation class tests
+# ---------------------------------------------------------------------------------------------------------------
+
+name = "my function"
+def adding(x, y):
+    return x + y
+args = 2, 2
+
+def test_Operation_add_function1():  
+    opx = bb.Operation(name, adding, *args)
+    assert opx.name == "my function"
+
+def test_Operation_add_function2():  
+    opx = bb.Operation(name, adding, *args)
+    assert opx.func == adding
+
+def test_Operation_add_function3():  
+    opx = bb.Operation(name, adding, *args)
+    assert args == opx.args
+
+def test_Operation_add_function4():  
+    opx = bb.Operation(name, adding, *args)
+    assert opx.run() == 4
+
+def test_Operation_add_function5():  
+    opx = bb.Operation(name, adding, 20, 15)
+    assert opx.run() == 35

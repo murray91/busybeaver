@@ -175,21 +175,34 @@ class Model:
             return None
 
     # Adds a raw python function and arguments to runstack
-    def addOperation(self, operation, *args):
-        self.runstack.append(["CUSTOM_OPERATION", operation, *args])
-        logging.debug("Added operation to runstack of {}: {}".format(self.name, operation))
+    def addOperation(self, func, *args):
+        self.runstack.append(Operation("CUSTOM_OPERATION", func, *args))
+        logging.debug("Added operation to runstack of {}: {}".format(self.name, func))
 
     # Adds a function in OPERATIONS to runstack, auto-filling arguments
-    def addPredefinedOperation(self, operation):
-        if operation in OPERATIONS:
+    def addPredefinedOperation(self, operation_name):
+        if operation_name in OPERATIONS:
             args = []
-            for arg in OPERATIONS[operation][1:]:
+            for arg in OPERATIONS[operation_name][1:]:
                 args.append(self.getFile(arg))
             if None in args:
-                logging.error("Input file for operation {} in model {} missing.".format(operation,self.name))
-            self.runstack.append([operation, OPERATIONS[operation][0], *args])
+                logging.error("Input file for operation {} in model {} missing.".format(operation_name,self.name))
+            self.runstack.append(Operation(operation_name, OPERATIONS[operation_name][0], *args))
         else:
-            logging.error("{} not a valid operation type. Check constants.py for valid types.".format(operation))
+            logging.error("{} not a valid operation type. Check constants.py for valid types.".format(operation_name))
 
-    def run(self, runstack_id):
-        return self.runstack[runstack_id][1](*self.runstack[runstack_id][2:])
+class Operation:
+    """
+    A class for holding information related to a single operation
+
+    Usage example:
+    my_operation = Operation("operation_name", function, *args)
+    """
+
+    def __init__(self, name, func, *args):
+        self.name = name
+        self.func = func
+        self.args = args
+
+    def run(self):
+        return self.func(*self.args)

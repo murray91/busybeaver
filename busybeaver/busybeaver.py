@@ -109,8 +109,8 @@ class Hut:
                 parser.set(model.name, processing_type, processing_path)
                 logging.debug("Saving attribute {} for {} as {}".format(processing_type, model.name, processing_path))
             for operation in model.runstack:
-                parser.set(model.name, operation[0], "True")
-                logging.debug("Saving attribute {} for {} as {}".format(operation[0], model.name, "True"))
+                parser.set(model.name, operation.name, "True")
+                logging.debug("Saving attribute {} for {} as {}".format(operation.name, model.name, "True"))
         logging.info("New configuration saved in memory, now writing to file...")
 
         f = open(new_file_path, "w")
@@ -147,6 +147,7 @@ class Model:
         self.name = model_name
         self.results = {}
         self.pfiles = {}
+        self.params = {}
 
         # Stores operations to be run as a list of lists, inner list format is [function_name, args]
         self.runstack = []

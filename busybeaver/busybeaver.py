@@ -83,8 +83,12 @@ class Hut:
                     model.addFile(*a)
                 elif a[0] in PROCESSING_FILE_TYPES:
                     model.addFile(*a)
+                elif a[0] in MODEL_PARAMETERS:
+                    model.addParam(*a)
                 elif a[0] in OPERATIONS and a[1] == "True":
                     model.addPredefinedOperation(a[0])
+                else:
+                    logging.info("Skipped unknown attribute in configuration file: {}".format(a[0]))
         
         logging.info("Config file loaded.")
 
@@ -108,6 +112,9 @@ class Hut:
             for processing_type, processing_path in model.pfiles.items():
                 parser.set(model.name, processing_type, processing_path)
                 logging.debug("Saving attribute {} for {} as {}".format(processing_type, model.name, processing_path))
+            for param, value in model.params.items():
+                parser.set(model.name, param, value)
+                logging.debug("Saving attribute {} for {} as {}".format(param, model.name, value))
             for operation in model.runstack:
                 parser.set(model.name, operation.name, "True")
                 logging.debug("Saving attribute {} for {} as {}".format(operation.name, model.name, "True"))
@@ -154,6 +161,7 @@ class Model:
 
         logging.info("Created model for {}.".format(self.name))
 
+    # Adds a file to either self.results or self.pfiles
     def addFile(self, file_type, file_path):
 
         if (file_type in RESULT_FILE_TYPES):
@@ -165,6 +173,14 @@ class Model:
         else:
             logging.error("{} not a valid file type. Check constants.py for valid types.".format(file_type))
 
+    # Adds a parameter to self.params
+    def addParam(self, param, value):
+        if param in MODEL_PARAMETERS:
+            self.params[param] = value
+            logging.debug("Added parameter to {}: {}".format(self.name, param))
+        else:
+            logging.error("{} not a valid parameter type. Check constants.py for valid types.".format(param))
+
     # Adds a raw python function and arguments to runstack
     def addOperation(self, func, *args):
         self.runstack.append(Operation("CUSTOM_OPERATION", func, *args))
@@ -175,21 +191,23 @@ class Model:
         if operation_name in OPERATIONS:
             args = []
             for arg in OPERATIONS[operation_name][1:]:
-                args.append(self.getFile(arg))
+                args.append(self.getValue(arg))
             if None in args:
                 logging.error("Input file for operation {} in model {} missing.".format(operation_name,self.name))
             self.runstack.append(Operation(operation_name, OPERATIONS[operation_name][0], *args))
         else:
             logging.error("{} not a valid operation type. Check constants.py for valid types.".format(operation_name))
 
-    # Returns the file path of a file type in self.results or self.pfiles
-    def getFile(self, file_type):
-        if file_type in self.results:
-            return self.results[file_type]
-        elif file_type in self.pfiles:
-            return self.pfiles[file_type]
+    # Returns the value of an attribute
+    def getValue(self, attribute):
+        if attribute in self.results:
+            return self.results[attribute]
+        elif attribute in self.pfiles:
+            return self.pfiles[attribute]
+        elif attribute in self.params:
+            return self.params[attribute]
         else:
-            logging.error("Could not find file type {} in model {}.".format(file_type, self.name))
+            logging.error("Could not find file type {} in model {}.".format(attribute, self.name))
             return None
 
 class Operation:

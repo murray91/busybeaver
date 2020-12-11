@@ -96,7 +96,7 @@ def test_Config_parsing5():
     config.read(config_file)
     models = config.sections()[1:]
     attributes = config.items(models[0])
-    assert attributes[9][0] in OPERATIONS
+    assert attributes[13][0] in OPERATIONS
 
 # Tests loading config file attributes
 # -----
@@ -189,6 +189,12 @@ def test_Hut_load_config_process_files2():
 
     assert "DEPTH_2D_ASC" not in res_names
 
+def test_Hut_load_config_params1():
+    testhut = bb.Hut(config_file)
+    model = testhut["newModel1"]
+
+    assert "DIRECTION_TIMESTEP" in model.params
+
 # TODO: WRITE TESTS FOR SAVE CONFIG
 
 # ---------------------------------------------------------------------------------------------------------------
@@ -230,6 +236,22 @@ def test_Model_add_processing_2():
     model.addFile(file_type, fake_path)
 
     assert not model.results and not model.pfiles, "Trouble adding processing file to Model object."
+
+# Tests for adding a parameter to a model
+# -----
+def test_Model_add_param_1():
+    param = "DIRECTION_TIMESTEP"
+    model = bb.Model("TestModel")
+    model.addParam(param, 30)
+
+    assert param in model.params, "Trouble adding parameter to Model object."
+
+def test_Model_add_param_2():
+    param = "INVALID PARAM"
+    model = bb.Model("TestModel")
+    model.addParam(param, 30)
+
+    assert param not in model.params, "Trouble adding parameter to Model object."
 
 # Tests for adding an operation to the model run stack
 # -----
@@ -273,6 +295,27 @@ def test_Model_add_operation_to_run_stack6():
     model.addPredefinedOperation("OP_FOR_TESTING_ONLY")
     expected_result = [model.results["DEPTH_2D_ASC"], model.pfiles["MODEL_BOUNDARY_POLYGON"]]
     assert expected_result == model.runstack[len(model.runstack)-1].run()
+
+def test_Model_add_operation_to_run_stack7():
+
+    testhut = bb.Hut(config_file)
+    model = testhut["newModel1"]
+    model.addPredefinedOperation("extractDirectionFromDfsu")
+    assert model.runstack[len(model.runstack)-1].args[0] == "My dfsu animated results"
+
+def test_Model_add_operation_to_run_stack8():
+
+    testhut = bb.Hut(config_file)
+    model = testhut["newModel1"]
+    model.addPredefinedOperation("extractDirectionFromDfsu")
+    assert model.runstack[len(model.runstack)-1].args[1] == "Direction path123"
+
+def test_Model_add_operation_to_run_stack9():
+
+    testhut = bb.Hut(config_file)
+    model = testhut["newModel1"]
+    model.addPredefinedOperation("extractDirectionFromDfsu")
+    assert int(model.runstack[len(model.runstack)-1].args[2]) == 32
 
 def test_Model_add_custom_operation1():
 

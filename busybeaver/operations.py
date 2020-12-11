@@ -24,6 +24,9 @@ def FOR_TESTING_ONLY(*args):
 #  
 def extractDirectionFromDfsu(input_dfsu, output_dfsu, timestep):
 
+    # Make sure timestep is an integer and not string
+    timestep = int(timestep)
+
     # Open dfsu and read specified timestep
     dfs = Dfsu(input_dfsu)
     ds = dfs.read(time_steps=timestep)

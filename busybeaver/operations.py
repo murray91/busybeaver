@@ -40,6 +40,29 @@ def extractDirectionFromDfsu(input_dfsu, output_dfsu, timestep):
     
     return True
 
+# createGDB
+# Creates a geodatabase for model
+#
+# Example usage:
+#   createGD()
+# 
+# Assumes
+#   -gdb takes name of model (self.name)
+#   -gdb is created in hut/model output_folder
+#  
+# TO-DO ... tweak this opx so it doesn't need passing model
+def createGDB(model):
+
+    if not os.path.exists(os.path.join(os.getcwd(), model.gdb)):
+        logger.info("Geobatase doesn't exist for {}. Creating now.".format(model.name))
+        arcpy.CreateFileGDB_management(model.gdb, model.name)
+        logger.info("Geodatabase created at:\n{}".format(model.gdb))
+    else:
+        logger.info("Geodatabase already exists for {}.".format(model.name))
+    
+    return True
+
+
 # process2DDepth
 # Insert description of function
 # Example usage: ...

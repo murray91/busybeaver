@@ -91,3 +91,21 @@ def test_Operation_extract_direction2():
     data1 = Dfsu(model.results["DFSU_REULTS_ANIMATED"]).read(time_steps=32)["Current direction"]
     data2 = Dfsu(model.pfiles["DFSU_RESULTS_DIRECTION"]).read(time_steps=0)["Current direction"]
     assert np.allclose(data1, data2,1e-05,equal_nan=True)
+
+# ---------------------------------------------------------------------------------------------------------------
+# Create geodatabase for model results, if not existing already
+# ---------------------------------------------------------------------------------------------------------------
+# Create geodatabase if it doesn't exist already
+
+@pytest.mark.arcpy
+def test_Operation_create_gdb():
+    hut = testHut()
+    model = hut["testmodel"]
+
+    if os.path.exists(os.path.join(os.getcwd(),model.gdb)):
+        os.rmdir(model.gdb)
+
+    model.addPredefinedOperation("createGDB")
+    model.runstack[len(model.runstack)-1].run()
+
+    assert os.path.exists(os.path.join(os.getcwd(),model.gdb))

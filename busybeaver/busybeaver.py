@@ -17,7 +17,7 @@ class Hut:
       
         self.config_file = config_file
         self.models = []
-        self.output_folder = os.getcwd()
+        self._output_folder = None
         self.crs = None
 
         if self.config_file != None:
@@ -42,6 +42,16 @@ class Hut:
 
     def __next__(self):
         pass
+
+    @property
+    def output_folder(self):
+        return self._output_folder
+
+    @output_folder.setter
+    def output_folder(self, value):
+        self._output_folder = value
+        for model in self.models:
+            model.output_folder = value
 
 
     def loadConfig(self, config_file):
@@ -72,6 +82,7 @@ class Hut:
         for name in models:
             new_model = Model(name)
             self.models.append(new_model)
+            self.models[len(self.models)-1].output_folder = self.output_folder
             logging.info("Added {} to hut.".format(new_model.name))
 
         # Import filenames / operations
@@ -151,7 +162,9 @@ class Model:
     """
     def __init__(self, model_name):
 
+        self.output_folder = None
         self.name = model_name
+        self._gdb = None
         self.results = {}
         self.pfiles = {}
         self.params = {}
@@ -160,6 +173,14 @@ class Model:
         self.runstack = []
 
         logging.info("Created model for {}.".format(self.name))
+
+    @property
+    def gdb(self):
+        return os.path.join(self.output_folder, "{}.gdb".format(self.name))
+
+    @gdb.setter
+    def gdb(self, value):
+        self._gdb = value
 
     # Adds a file to either self.results or self.pfiles
     def addFile(self, file_type, file_path):

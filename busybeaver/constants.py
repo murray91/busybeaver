@@ -32,6 +32,7 @@ MODEL_PARAMETERS = {
 OPERATIONS = {
     "extractDirectionFromDfsu" :    [opx.extractDirectionFromDfsu, 
                                     "DFSU_REULTS_ANIMATED", "DFSU_RESULTS_DIRECTION", "DIRECTION_TIMESTEP"],
+    "createGDB" : [opx.createGDB], 
     "process2DDepth" : [opx.process2DDepth, "DEPTH_2D_ASC"],        
     "process2DVelocity" : [opx.process2DVelocity, "DEPTH_2D_ASC"],      
     "process2DDirection" : [opx.process2DDirection, "DEPTH_2D_ASC"],     

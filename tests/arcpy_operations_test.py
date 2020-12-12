@@ -34,6 +34,8 @@ def testHut():
     }
 
     params = {
+        "MODEL_NAME" : "testmodel",
+        "MODEL_GDB_PATH" : r"tests\data\test_output\testmodel.gdb",
         "DIRECTION_TIMESTEP" : 32,     
     }
 
@@ -97,15 +99,29 @@ def test_Operation_extract_direction2():
 # ---------------------------------------------------------------------------------------------------------------
 # Create geodatabase if it doesn't exist already
 
+def test_Operation_create_gdb_args1():
+    hut = testHut()
+    model = hut["testmodel"]
+    model.addPredefinedOperation("createGDB")
+    rs = model.runstack[len(model.runstack)-1]
+    assert rs.func == opx.createGDB
+
+def test_Operation_create_gdb_args2():
+    hut = testHut()
+    model = hut["testmodel"]
+    model.addPredefinedOperation("createGDB")
+    rs = model.runstack[len(model.runstack)-1]
+    assert rs.args == (r"tests\data\test_output\testmodel.gdb", "testmodel")
+
 @pytest.mark.arcpy
-def test_Operation_create_gdb():
+def test_Operation_create_gdb1():
     hut = testHut()
     model = hut["testmodel"]
 
-    if os.path.exists(os.path.join(os.getcwd(),model.gdb)):
-        os.rmdir(model.gdb)
+    if os.path.exists(model.params["MODEL_GDB_PATH"]):
+        os.rmdir(model.params["MODEL_GDB_PATH"])
 
     model.addPredefinedOperation("createGDB")
     model.runstack[len(model.runstack)-1].run()
 
-    assert os.path.exists(os.path.join(os.getcwd(),model.gdb))
+    assert os.path.exists(model.params["MODEL_GDB_PATH"])

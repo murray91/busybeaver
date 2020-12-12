@@ -22,6 +22,8 @@ PROCESSING_FILE_TYPES = {
 # MODEL_PARAMETERS
 # Standardized names for other model parameters which are not files
 MODEL_PARAMETERS = {
+    "MODEL_NAME", # Name/alias of the model
+    "MODEL_GDB_PATH", # Path to the model's GDB
     "DIRECTION_TIMESTEP", # Integer timestep to extract direction from dfsu in model       
 }
 
@@ -32,7 +34,7 @@ MODEL_PARAMETERS = {
 OPERATIONS = {
     "extractDirectionFromDfsu" :    [opx.extractDirectionFromDfsu, 
                                     "DFSU_REULTS_ANIMATED", "DFSU_RESULTS_DIRECTION", "DIRECTION_TIMESTEP"],
-    "createGDB" : [opx.createGDB], 
+    "createGDB" : [opx.createGDB, "MODEL_GDB_PATH", "MODEL_NAME"], 
     "process2DDepth" : [opx.process2DDepth, "DEPTH_2D_ASC"],        
     "process2DVelocity" : [opx.process2DVelocity, "DEPTH_2D_ASC"],      
     "process2DDirection" : [opx.process2DDirection, "DEPTH_2D_ASC"],     

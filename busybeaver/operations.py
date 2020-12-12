@@ -2,6 +2,10 @@ import numpy as np
 from mikeio import Dfsu
 from mikeio.eum import ItemInfo, EUMType, EUMUnit
 from mikeio import Dataset
+import os
+import logging
+
+logging.basicConfig(filename='bb.log', level=logging.DEBUG)
 
 def TEMPORARY(*args):
     return "TEST"
@@ -44,21 +48,17 @@ def extractDirectionFromDfsu(input_dfsu, output_dfsu, timestep):
 # Creates a geodatabase for model
 #
 # Example usage:
-#   createGD()
+#   createGD("C:/some/path/to/my.gdb", "Name of GDB")
 # 
-# Assumes
-#   -gdb takes name of model (self.name)
-#   -gdb is created in hut/model output_folder
-#  
-# TO-DO ... tweak this opx so it doesn't need passing model
-def createGDB(model):
 
-    if not os.path.exists(os.path.join(os.getcwd(), model.gdb)):
-        logger.info("Geobatase doesn't exist for {}. Creating now.".format(model.name))
-        arcpy.CreateFileGDB_management(model.gdb, model.name)
-        logger.info("Geodatabase created at:\n{}".format(model.gdb))
+def createGDB(gdb_path, gdb_name):
+
+    if not os.path.exists(gdb_path):
+        logging.info("Geobatase doesn't exist for {}. Creating now.".format(gdb_name))
+        arcpy.CreateFileGDB_management(gdb_path, gdb_name)
+        logging.info("Geodatabase created at:\n{}".format(gdb_path))
     else:
-        logger.info("Geodatabase already exists for {}.".format(model.name))
+        logging.info("Geodatabase already exists for {}.".format(gdb_name))
     
     return True
 

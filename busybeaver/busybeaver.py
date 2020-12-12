@@ -163,24 +163,15 @@ class Model:
     def __init__(self, model_name):
 
         self.output_folder = None
-        self.name = model_name
-        self._gdb = None
         self.results = {}
         self.pfiles = {}
-        self.params = {}
+        self.params = {"MODEL_NAME":model_name}
+        self.name = model_name
 
         # Stores operations to be run as a list of lists, inner list format is [function_name, args]
         self.runstack = []
 
         logging.info("Created model for {}.".format(self.name))
-
-    @property
-    def gdb(self):
-        return os.path.join(self.output_folder, "{}.gdb".format(self.name))
-
-    @gdb.setter
-    def gdb(self, value):
-        self._gdb = value
 
     # Adds a file to either self.results or self.pfiles
     def addFile(self, file_type, file_path):
@@ -214,7 +205,7 @@ class Model:
             for arg in OPERATIONS[operation_name][1:]:
                 args.append(self.getValue(arg))
             if None in args:
-                logging.error("Input file for operation {} in model {} missing.".format(operation_name,self.name))
+                logging.error("Arguments for operation {} in model {} missing.".format(operation_name,self.name))
             self.runstack.append(Operation(operation_name, OPERATIONS[operation_name][0], *args))
         else:
             logging.error("{} not a valid operation type. Check constants.py for valid types.".format(operation_name))
@@ -228,7 +219,7 @@ class Model:
         elif attribute in self.params:
             return self.params[attribute]
         else:
-            logging.error("Could not find file type {} in model {}.".format(attribute, self.name))
+            logging.error("Could not find attribute type {} in model {}.".format(attribute, self.name))
             return None
 
 class Operation:

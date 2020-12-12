@@ -2,6 +2,7 @@ import busybeaver as bb
 import configparser
 from busybeaver.constants import *
 import os
+import shutil
 import pytest
 import filecmp
 import busybeaver.operations as opx
@@ -119,7 +120,7 @@ def test_Operation_create_gdb1():
     model = hut["testmodel"]
 
     if os.path.exists(model.params["MODEL_GDB_PATH"]):
-        os.rmdir(model.params["MODEL_GDB_PATH"])
+        shutil.rmtree(model.params["MODEL_GDB_PATH"])
 
     model.addPredefinedOperation("createGDB")
     model.runstack[len(model.runstack)-1].run()

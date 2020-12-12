@@ -4,6 +4,7 @@ from mikeio.eum import ItemInfo, EUMType, EUMUnit
 from mikeio import Dataset
 import os
 import logging
+import arcpy
 
 logging.basicConfig(filename='bb.log', level=logging.DEBUG)
 
@@ -48,14 +49,15 @@ def extractDirectionFromDfsu(input_dfsu, output_dfsu, timestep):
 # Creates a geodatabase for model
 #
 # Example usage:
-#   createGD("C:/some/path/to/my.gdb", "Name of GDB")
+#   createGD("C:/some/path/to", "Name of GDB")
 # 
 
 def createGDB(gdb_path, gdb_name):
 
     if not os.path.exists(gdb_path):
         logging.info("Geobatase doesn't exist for {}. Creating now.".format(gdb_name))
-        arcpy.CreateFileGDB_management(gdb_path, gdb_name)
+        arcpy.env.workspace = os.getcwd()
+        arcpy.CreateFileGDB_management(os.path.dirname(gdb_path), gdb_name)
         logging.info("Geodatabase created at:\n{}".format(gdb_path))
     else:
         logging.info("Geodatabase already exists for {}.".format(gdb_name))

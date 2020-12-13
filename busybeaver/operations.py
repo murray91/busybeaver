@@ -5,8 +5,6 @@ from mikeio import Dataset
 import os
 import logging
 
-logging.basicConfig(filename='bb.log', level=logging.DEBUG)
-
 def TEMPORARY(*args):
     return "TEST"
 
@@ -56,7 +54,6 @@ def createGDB(gdb_path, gdb_name):
     import arcpy
 
     if not os.path.exists(gdb_path):
-        logging.info("Geobatase doesn't exist for {}. Creating now.".format(gdb_name))
         arcpy.env.workspace = os.getcwd()
         arcpy.CreateFileGDB_management(os.path.dirname(gdb_path), gdb_name)
         logging.info("Geodatabase created at:\n{}".format(gdb_path))
@@ -115,6 +112,7 @@ def clipAllRasters(gdb_name, clip_shapefile, clip_field, field_value):
 
     # Clip rasters
     for ras in arcpy.ListRasters("*", "All"):
+        logging.info("Clipping raster {}...".format(ras))
         arcpy.Clip_management(
             in_raster = ras, 
             out_raster = "{}_CLIPPED".format(ras),
@@ -141,6 +139,7 @@ def setCRS(gdb_name, crs):
 
     # set coordinate system for all rasters
     for ras in arcpy.ListRasters("*", "All"):
+        logging.info("Defining coordinate system for raster {}...",format(ras))
         arcpy.DefineProjection_management(ras, sr)
 
     return True
@@ -159,6 +158,7 @@ def mergeRasters(raster1, raster2, merged_name, gdb_name):
     gdb_name = os.path.abspath(gdb_name)
     arcpy.env.workspace = gdb_name
 
+    logging.info("Merging rasters {} and {}...".format(raster1, raster2))
     arcpy.MosaicToNewRaster_management("{};{}".format(raster2, raster1), gdb_name, merged_name,
                                    "", "32_BIT_FLOAT", "1", "1",
                                    "LAST", "LAST")

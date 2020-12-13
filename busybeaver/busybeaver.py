@@ -4,7 +4,8 @@ from .constants import *
 import collections
 import os
 
-logging.basicConfig(filename='bb.log', level=logging.DEBUG)
+logging.basicConfig(filename='bb.log', filemode='w', format='%(asctime)s - %(levelname)s: %(message)s', 
+                    datefmt='%m/%d/%Y %I:%M:%S %p', level=logging.INFO)
 
 class Hut:
     """
@@ -15,6 +16,7 @@ class Hut:
     """
     def __init__(self, config_file = None):
       
+        logging.info("Created new Hut.")
         self.config_file = config_file
         self.models = []
         self._output_folder = None
@@ -58,35 +60,35 @@ class Hut:
         """
         Loads a configuration .ini file into the hut.
         """
-        logging.info("Loading config file...")
+        logging.info("Loading config file into Hut...")
 
         # Delete any old models
         if not self.models == []:
-            logging.info("Removed previous models in hut while loading config file.")
+            logging.info("Removed previous models in Hut while loading config file.")
             self.models = []
 
         # Read the config file
-        logging.info("Reading config file.")
+        logging.info("Reading config file...")
         config = configparser.RawConfigParser()
         config.optionxform=str
         config.read(self.config_file)
 
         # Load general results
-        logging.info("Applying general hut settings...")
+        logging.info("Applying general settings to Hut...")
         self.output_folder = config.get("setup", "default_output_path")
         self.crs = config.get("setup", "crs")
 
         # Create empty Model objects for each model
-        logging.info("Adding models to hut...")
+        logging.info("Adding models to Hut...")
         models = config.sections()[1:]
         for name in models:
             new_model = Model(name)
             self.models.append(new_model)
             self.models[len(self.models)-1].output_folder = self.output_folder
-            logging.info("Added {} to hut.".format(new_model.name))
+            logging.info("Added {} to Hut.".format(new_model.name))
 
         # Import filenames / operations
-        logging.info("Importing files and operations into hut models...")
+        logging.info("Importing parameters into Hut models...")
         for model in self.models:
             attributes = config.items(model.name)
             for a in attributes:
@@ -99,14 +101,14 @@ class Hut:
                 elif a[0] in OPERATIONS and a[1] == "True":
                     model.addPredefinedOperation(a[0])
                 else:
-                    logging.info("Skipped unknown attribute in configuration file: {}".format(a[0]))
+                    logging.info("Skipped unknown parameter in config file: {}.".format(a[0]))
         
         logging.info("Config file loaded.")
 
     # Allows saving the hut configuration to a new config file
     def saveConfig(self, new_file_path):
 
-        logging.info("Saving hut to new config file...")
+        logging.info("Saving Hut to new config file...")
         parser = configparser.RawConfigParser()
         parser.optionxform = str
 
@@ -129,16 +131,18 @@ class Hut:
             for operation in model.runstack:
                 parser.set(model.name, operation.name, "True")
                 logging.debug("Saving attribute {} for {} as {}".format(operation.name, model.name, "True"))
-        logging.info("New configuration saved in memory, now writing to file...")
+        logging.debug("New configuration saved in memory, now writing to file...")
 
         f = open(new_file_path, "w")
         parser.write(f)
         f.close()
 
-        logging.info("Saved configuration to file.")
+        logging.info("Saved configuration to config file: {}.".format(new_file_path))
     
     def runAll(self):
+        logging.info("Starting to run operations for all models.")
         for model in self.models:
+            logging.info("Running operations for {}...".format(model.name))
             for opx in model.runstack:
                 opx.run()
 
@@ -180,7 +184,7 @@ class Model:
 
         self.setupDefaults()
 
-        logging.info("Created model for {}.".format(self.name))
+        logging.info("Created model: {}.".format(self.name))
 
     # Setup default parameters
     def setupDefaults(self):
@@ -253,4 +257,5 @@ class Operation:
         self.args = args
 
     def run(self):
+        logging.info("Running {}...".format(self.name))
         return self.func(*self.args)

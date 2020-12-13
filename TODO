@@ -1,5 +1,3 @@
--Fix logging for operations
--Clean logging so it makes more sense
 -Add testing for runAll
 -Add testing for saveConfig
 -Add a way to finalize GDBs

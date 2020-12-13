@@ -164,9 +164,3 @@ def mergeRasters(raster1, raster2, merged_name, gdb_name):
                                    "LAST", "LAST")
 
     return True
-
-# processClean
-# Insert description of function
-# Example usage: ...
-def processClean(*args):
-    return None

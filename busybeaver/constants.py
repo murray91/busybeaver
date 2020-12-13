@@ -52,6 +52,5 @@ OPERATIONS = {
     "processCRS" : [opx.setCRS, "MODEL_GDB_PATH", "CRS"],  
     "processMergeRiver2DDepth" : [opx.mergeRasters, "2D_DEPTH_GDB_NAME", "RIVER_DEPTH_GDB_NAME", 
                                 "FULL_DEPTH_GDB_NAME", "MODEL_GDB_PATH"],
-    "processClean" : [opx.processClean, "DEPTH_2D_ASC"],
     "OP_FOR_TESTING_ONLY" : [opx.FOR_TESTING_ONLY, "DEPTH_2D_ASC", "MODEL_BOUNDARY_POLYGON"]
 }

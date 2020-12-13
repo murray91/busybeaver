@@ -132,10 +132,8 @@ def test_Hut_load_config_operations2():
         errors.append("Error adding processASC_2DDepth operation.")
     if not "processASC_2DDirection" in funcs:
         errors.append("Error adding processASC_2DDirection operation.")
-    if not "processFullDepth" in funcs:
-        errors.append("Error adding processFullDepth operation.")
-    if not "processClipVelocity" in funcs:
-        errors.append("Error adding processClean operation.")
+    if not "processClipResults" in funcs:
+        errors.append("Error adding processClipResults operation.")
 
     assert not errors, "{}".format("\n".join(errors))
 

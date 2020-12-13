@@ -8,7 +8,11 @@ import filecmp
 import busybeaver.operations as opx
 from mikeio import Dfsu
 import numpy as np
-import arcpy
+
+# comment this out if testing without arcpy
+# also use pytest -m "not arcpy"
+#
+# import arcpy 
 
 # These tests require an arcpy license to run and can take long to run
 
@@ -30,7 +34,7 @@ def testHut():
     }
 
     process_files = {
-        "MODEL_BOUNDARY_POLYGON" : None,
+        "MODEL_BOUNDARY_POLYGON" : r"tests\data\clip_polygons.shp",
         "DEPTH_RIVER_MASK_POLYGON" : None, 
         "DFSU_RESULTS_DIRECTION" : r"tests\data\test_output\test_animed_results_direction.dfsu",
     }
@@ -39,6 +43,9 @@ def testHut():
         "MODEL_NAME" : "testmodel",
         "MODEL_GDB_PATH" : r"tests\data\test_output\testmodel.gdb",
         "DIRECTION_TIMESTEP" : 32,     
+        "CLIP_FIELD" : "Name",
+        "CLIP_VALUE" : "testmodel",
+        "CRS" : "ETRS 1989 UTM Zone 32N",
     }
 
     model = hut["testmodel"]
@@ -159,6 +166,7 @@ def test_Operation_processASC_2DDepth_args4():
     rs = model.runstack[len(model.runstack)-1]
     assert rs.args[2] == "testmodel_2D_Depth"
 
+# check it outputs raster to gdb
 @pytest.mark.arcpy
 def test_Operation_processASC_2DDepth_1():
     hut = testHut()
@@ -204,6 +212,7 @@ def test_Operation_processASC_2DVelocity_args4():
     rs = model.runstack[len(model.runstack)-1]
     assert rs.args[2] == "testmodel_2D_Velocity"
 
+# check it outputs raster to gdb
 @pytest.mark.arcpy
 def test_Operation_processASC_2DVelocity_1():
     hut = testHut()
@@ -249,6 +258,7 @@ def test_Operation_processASC_2DDirection_args4():
     rs = model.runstack[len(model.runstack)-1]
     assert rs.args[2] == "testmodel_2D_Direction"
 
+# check it outputs raster to gdb
 @pytest.mark.arcpy
 def test_Operation_processASC_2DDirection_1():
     hut = testHut()
@@ -261,3 +271,89 @@ def test_Operation_processASC_2DDirection_1():
     rasterExists = arcpy.Exists(rs.args[2])
 
     assert rasterExists
+
+# ---------------------------------------------------------------------------------------------------------------
+# Clip all rasters
+# ---------------------------------------------------------------------------------------------------------------
+
+def test_Operation_clip_rasters_args1():
+    hut = testHut()
+    model = hut["testmodel"]
+    model.addPredefinedOperation("processClipResults")
+    rs = model.runstack[len(model.runstack)-1]
+    assert rs.func == opx.clipAllRasters
+
+def test_Operation_clip_rasters_args2():
+    hut = testHut()
+    model = hut["testmodel"]
+    model.addPredefinedOperation("processClipResults")
+    rs = model.runstack[len(model.runstack)-1]
+    assert rs.args[0] == r"tests\data\test_output\testmodel.gdb"
+
+def test_Operation_clip_rasters_args3():
+    hut = testHut()
+    model = hut["testmodel"]
+    model.addPredefinedOperation("processClipResults")
+    rs = model.runstack[len(model.runstack)-1]
+    assert rs.args[1] == r"tests\data\clip_polygons.shp"
+
+def test_Operation_clip_rasters_args4():
+    hut = testHut()
+    model = hut["testmodel"]
+    model.addPredefinedOperation("processClipResults")
+    rs = model.runstack[len(model.runstack)-1]
+    assert rs.args[2] == r"Name"
+
+def test_Operation_clip_rasters_args5():
+    hut = testHut()
+    model = hut["testmodel"]
+    model.addPredefinedOperation("processClipResults")
+    rs = model.runstack[len(model.runstack)-1]
+    assert rs.args[3] == r"testmodel"
+
+# check it outputs clip raster to gdb
+@pytest.mark.arcpy
+def test_Operation_clip_rasters_1():
+    hut = testHut()
+    model = hut["testmodel"]
+    model.addPredefinedOperation("processClipResults")
+    rs = model.runstack[len(model.runstack)-1]
+
+    rs.run()
+
+    arcpy.env.workspace = model.params["MODEL_GDB_PATH"]
+
+    number_clipped = 0
+    number_rasters = 0
+    for ras in arcpy.ListRasters("*", "All"):
+        number_rasters += 1
+        if "_CLIPPED" in ras:
+            number_clipped += 1
+
+    # since all rasters are clipped
+    assert number_clipped == number_rasters / 2
+
+# ---------------------------------------------------------------------------------------------------------------
+# Set coordinate system
+# ---------------------------------------------------------------------------------------------------------------
+
+def test_Operation_set_CRS_args1():
+    hut = testHut()
+    model = hut["testmodel"]
+    model.addPredefinedOperation("processCRS")
+    rs = model.runstack[len(model.runstack)-1]
+    assert rs.func == opx.setCRS
+
+def test_Operation_set_CRS_args2():
+    hut = testHut()
+    model = hut["testmodel"]
+    model.addPredefinedOperation("processCRS")
+    rs = model.runstack[len(model.runstack)-1]
+    assert rs.args[0] == r"tests\data\test_output\testmodel.gdb"
+
+def test_Operation_set_CRS_args3():
+    hut = testHut()
+    model = hut["testmodel"]
+    model.addPredefinedOperation("processCRS")
+    rs = model.runstack[len(model.runstack)-1]
+    assert rs.args[1] == r"ETRS 1989 UTM Zone 32N"

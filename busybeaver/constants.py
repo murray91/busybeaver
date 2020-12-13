@@ -14,7 +14,7 @@ RESULT_FILE_TYPES = {
 # PROCESSING_FILES
 # Standardized names for files needed to postprocess results
 PROCESSING_FILE_TYPES = {
-    "MODEL_BOUNDARY_POLYGON",       # Boundary to clip model results to
+    "MODEL_BOUNDARY_POLYGON",       # Boundaries to clip model results to
     "DEPTH_RIVER_MASK_POLYGON",     # Polygon areas to be removed from DEPTH_RIVER
     "DFSU_RESULTS_DIRECTION",     # Output location for extractDirectionFromDfsu
 }
@@ -29,6 +29,9 @@ MODEL_PARAMETERS = {
     "2D_VELOCITY_GDB_NAME", # Name of 2d velocity raster (exclusing river) in gdb
     "2D_DIRECTION_GDB_NAME", # Name of 2d direction raster (excluding river) in gdb
     "RIVER_DEPTH_GDB_NAME", # Name of 2d river depth raster in gdb.
+    "CLIP_FIELD", # Name of column in attribute table of MODEL_BOUNDARY_POLYGON
+    "CLIP_VALUE", # Value in CLIP_FIELD to use as clip olygon
+    "CRS", # Coordinate system string for all rasters (e.g. 'ETRS 1989 UTM Zone 32N')
 }
 
 # OPERATION NAMES LINKED TO FUNCTION AND FILE_TYPES
@@ -42,10 +45,10 @@ OPERATIONS = {
     "processASC_2DDepth" : [opx.ascToGDB, "DEPTH_2D_ASC", "MODEL_GDB_PATH", "2D_DEPTH_GDB_NAME"],        
     "processASC_2DVelocity" : [opx.ascToGDB, "VELOCITY_2D_ASC", "MODEL_GDB_PATH", "2D_VELOCITY_GDB_NAME"],      
     "processASC_2DDirection" : [opx.ascToGDB, "DIRECTION_2D_ASC", "MODEL_GDB_PATH", "2D_DIRECTION_GDB_NAME"],     
-    "processASC_RiverDepth" : [opx.ascToGDB, "DEPTH_RIVER_ASC", "MODEL_GDB_PATH", "RIVER_DEPTH_GDB_NAME"],    
-    "processFullDepth" : [opx.processFullDepth, "DEPTH_2D_ASC"],    
-    "processClipDepth" : [opx.processClipDepth, "DEPTH_2D_ASC"],      
-    "processClipVelocity" : [opx.processClipVelocity, "DEPTH_2D_ASC"],      
+    "processASC_RiverDepth" : [opx.ascToGDB, "DEPTH_RIVER_ASC", "MODEL_GDB_PATH", "RIVER_DEPTH_GDB_NAME"],        
+    "processClipResults" : [opx.clipAllRasters, "MODEL_GDB_PATH", "MODEL_BOUNDARY_POLYGON",
+                            "CLIP_FIELD", "CLIP_VALUE"],   
+    "processCRS" : [opx.setCRS, "MODEL_GDB_PATH", "CRS"],   
     "processClean" : [opx.processClean, "DEPTH_2D_ASC"],
     "OP_FOR_TESTING_ONLY" : [opx.FOR_TESTING_ONLY, "DEPTH_2D_ASC", "MODEL_BOUNDARY_POLYGON"]
 }

@@ -171,3 +171,93 @@ def test_Operation_processASC_2DDepth_1():
     rasterExists = arcpy.Exists(rs.args[2])
 
     assert rasterExists
+
+# ---------------------------------------------------------------------------------------------------------------
+# Converts ASC velocity files to gdb
+# ---------------------------------------------------------------------------------------------------------------
+
+def test_Operation_processASC_2DVelocity_args1():
+    hut = testHut()
+    model = hut["testmodel"]
+    model.addPredefinedOperation("processASC_2DVelocity")
+    rs = model.runstack[len(model.runstack)-1]
+    assert rs.func == opx.ascToGDB
+
+def test_Operation_processASC_2DVelocity_args2():
+    hut = testHut()
+    model = hut["testmodel"]
+    model.addPredefinedOperation("processASC_2DVelocity")
+    rs = model.runstack[len(model.runstack)-1]
+    assert rs.args[0] == r"tests\data\MIKE\test_max_results_speed0.asc"
+
+def test_Operation_processASC_2DVelocity_args3():
+    hut = testHut()
+    model = hut["testmodel"]
+    model.addPredefinedOperation("processASC_2DVelocity")
+    rs = model.runstack[len(model.runstack)-1]
+    assert rs.args[1] == r"tests\data\test_output\testmodel.gdb"
+
+def test_Operation_processASC_2DVelocity_args4():
+    hut = testHut()
+    model = hut["testmodel"]
+    model.addPredefinedOperation("processASC_2DVelocity")
+    rs = model.runstack[len(model.runstack)-1]
+    assert rs.args[2] == "testmodel_2D_Velocity"
+
+@pytest.mark.arcpy
+def test_Operation_processASC_2DVelocity_1():
+    hut = testHut()
+    model = hut["testmodel"]
+    model.addPredefinedOperation("processASC_2DVelocity")
+    rs = model.runstack[len(model.runstack)-1]
+    rs.run()
+
+    arcpy.env.workspace = model.params["MODEL_GDB_PATH"]
+    rasterExists = arcpy.Exists(rs.args[2])
+
+    assert rasterExists
+
+# ---------------------------------------------------------------------------------------------------------------
+# Converts ASC direction files to gdb
+# ---------------------------------------------------------------------------------------------------------------
+
+def test_Operation_processASC_2DDirection_args1():
+    hut = testHut()
+    model = hut["testmodel"]
+    model.addPredefinedOperation("processASC_2DDirection")
+    rs = model.runstack[len(model.runstack)-1]
+    assert rs.func == opx.ascToGDB
+
+def test_Operation_processASC_2DDirection_args2():
+    hut = testHut()
+    model = hut["testmodel"]
+    model.addPredefinedOperation("processASC_2DDirection")
+    rs = model.runstack[len(model.runstack)-1]
+    assert rs.args[0] == r"tests\data\MIKE\test_animated_results_direction32.asc"
+
+def test_Operation_processASC_2DDirection_args3():
+    hut = testHut()
+    model = hut["testmodel"]
+    model.addPredefinedOperation("processASC_2DDirection")
+    rs = model.runstack[len(model.runstack)-1]
+    assert rs.args[1] == r"tests\data\test_output\testmodel.gdb"
+
+def test_Operation_processASC_2DDirection_args4():
+    hut = testHut()
+    model = hut["testmodel"]
+    model.addPredefinedOperation("processASC_2DDirection")
+    rs = model.runstack[len(model.runstack)-1]
+    assert rs.args[2] == "testmodel_2D_Direction"
+
+@pytest.mark.arcpy
+def test_Operation_processASC_2DDirection_1():
+    hut = testHut()
+    model = hut["testmodel"]
+    model.addPredefinedOperation("processASC_2DDirection")
+    rs = model.runstack[len(model.runstack)-1]
+    rs.run()
+
+    arcpy.env.workspace = model.params["MODEL_GDB_PATH"]
+    rasterExists = arcpy.Exists(rs.args[2])
+
+    assert rasterExists

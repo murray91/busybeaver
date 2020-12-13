@@ -136,6 +136,13 @@ class Hut:
         f.close()
 
         logging.info("Saved configuration to file.")
+    
+    def runAll(self):
+        for model in self.models:
+            for opx in model.runstack:
+                opx.run()
+
+        return True
 
 # Allows iterating over Hut to get models      
 class HutIterator:

@@ -29,6 +29,7 @@ MODEL_PARAMETERS = {
     "2D_VELOCITY_GDB_NAME", # Name of 2d velocity raster (exclusing river) in gdb
     "2D_DIRECTION_GDB_NAME", # Name of 2d direction raster (excluding river) in gdb
     "RIVER_DEPTH_GDB_NAME", # Name of 2d river depth raster in gdb.
+    "FULL_DEPTH_GDB_NAME", # Name of full depth raster (2d and river merged)
     "CLIP_FIELD", # Name of column in attribute table of MODEL_BOUNDARY_POLYGON
     "CLIP_VALUE", # Value in CLIP_FIELD to use as clip olygon
     "CRS", # Coordinate system string for all rasters (e.g. 'ETRS 1989 UTM Zone 32N')
@@ -48,7 +49,9 @@ OPERATIONS = {
     "processASC_RiverDepth" : [opx.ascToGDB, "DEPTH_RIVER_ASC", "MODEL_GDB_PATH", "RIVER_DEPTH_GDB_NAME"],        
     "processClipResults" : [opx.clipAllRasters, "MODEL_GDB_PATH", "MODEL_BOUNDARY_POLYGON",
                             "CLIP_FIELD", "CLIP_VALUE"],   
-    "processCRS" : [opx.setCRS, "MODEL_GDB_PATH", "CRS"],   
+    "processCRS" : [opx.setCRS, "MODEL_GDB_PATH", "CRS"],  
+    "processMergeRiver2DDepth" : [opx.mergeRasters, "2D_DEPTH_GDB_NAME", "RIVER_DEPTH_GDB_NAME", 
+                                "FULL_DEPTH_GDB_NAME", "MODEL_GDB_PATH"],
     "processClean" : [opx.processClean, "DEPTH_2D_ASC"],
     "OP_FOR_TESTING_ONLY" : [opx.FOR_TESTING_ONLY, "DEPTH_2D_ASC", "MODEL_BOUNDARY_POLYGON"]
 }

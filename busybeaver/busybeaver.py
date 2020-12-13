@@ -181,6 +181,7 @@ class Model:
         self.params["2D_VELOCITY_GDB_NAME"] = "{}_2D_Velocity".format(self.name)
         self.params["2D_DIRECTION_GDB_NAME"] = "{}_2D_Direction".format(self.name)
         self.params["RIVER_DEPTH_GDB_NAME"] = "{}_River_Depth".format(self.name)
+        self.params["FULL_DEPTH_GDB_NAME"] = "{}_Full_Depth".format(self.name)
 
     # Adds a file to either self.results or self.pfiles
     def addFile(self, file_type, file_path):

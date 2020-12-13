@@ -116,7 +116,7 @@ def clipAllRasters(gdb_name, clip_shapefile, clip_field, field_value):
     # Clip rasters
     for ras in arcpy.ListRasters("*", "All"):
         arcpy.Clip_management(
-            in_raster = ras_path, 
+            in_raster = ras, 
             out_raster = "{}_CLIPPED".format(ras),
             in_template_dataset = geom,
             clipping_geometry = "ClippingGeometry")
@@ -131,6 +131,8 @@ def clipAllRasters(gdb_name, clip_shapefile, clip_field, field_value):
 # 
 def setCRS(gdb_name, crs):
 
+    import arcpy
+
     # convert relative paths to absolute to work with arcpy function
     gdb_name = os.path.abspath(gdb_name)
     arcpy.env.workspace = gdb_name
@@ -143,23 +145,25 @@ def setCRS(gdb_name, crs):
 
     return True
 
-# processFullDepth
-# Insert description of function
-# Example usage: ...
-def processFullDepth(*args):
-    return None
+# mergeRasters
+# Merges two rasters. Raster 1 values take priority of Raster 2.
+#
+# Example usage:
+#   mergeRasters("raster1", "raster2", #merged raster", "gdb_with_both_rasters.gdb")
+# 
+def mergeRasters(raster1, raster2, merged_name, gdb_name):
 
-# processClipDepth
-# Insert description of function
-# Example usage: ...
-def processClipDepth(*args):
-    return None
+    import arcpy
 
-# processClipVelocity
-# Insert description of function
-# Example usage: ...
-def processClipVelocity(*args):
-    return None
+    # convert relative paths to absolute to work with arcpy function
+    gdb_name = os.path.abspath(gdb_name)
+    arcpy.env.workspace = gdb_name
+
+    arcpy.MosaicToNewRaster_management("{};{}".format(raster2, raster1), gdb_name, merged_name,
+                                   "", "32_BIT_FLOAT", "1", "1",
+                                   "LAST", "LAST")
+
+    return True
 
 # processClean
 # Insert description of function

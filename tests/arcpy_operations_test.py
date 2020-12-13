@@ -11,8 +11,7 @@ import numpy as np
 
 # comment this out if testing without arcpy
 # also use pytest -m "not arcpy"
-#
-# import arcpy 
+import arcpy 
 
 # These tests require an arcpy license to run and can take long to run
 
@@ -28,7 +27,7 @@ def testHut():
         "DFSU_REULTS_ANIMATED" : r"tests\data\MIKE\test_animated_results.dfsu",
         "DFSU_RESULTS_MAX" : r"tests\data\MIKE\test_max_results.dfsu",     
         "DEPTH_2D_ASC" : r"tests\data\MIKE\test_max_results_depth0.asc",
-        "DEPTH_RIVER_ASC" : None,
+        "DEPTH_RIVER_ASC" : r"tests\data\MIKE\test_max_results_depth0.asc",
         "VELOCITY_2D_ASC" : r"tests\data\MIKE\test_max_results_speed0.asc",
         "DIRECTION_2D_ASC" : r"tests\data\MIKE\test_animated_results_direction32.asc",
     }
@@ -135,7 +134,7 @@ def test_Operation_create_gdb1():
     assert os.path.exists(model.params["MODEL_GDB_PATH"])
 
 # ---------------------------------------------------------------------------------------------------------------
-# Converts ASC depth files to gdb
+# Converts ASC 2d depth files to gdb
 # ---------------------------------------------------------------------------------------------------------------
 
 def test_Operation_processASC_2DDepth_args1():
@@ -273,6 +272,53 @@ def test_Operation_processASC_2DDirection_1():
     assert rasterExists
 
 # ---------------------------------------------------------------------------------------------------------------
+# Converts ASC river files to gdb
+# ---------------------------------------------------------------------------------------------------------------
+
+def test_Operation_processASC_RiverDepth_args1():
+    hut = testHut()
+    model = hut["testmodel"]
+    model.addPredefinedOperation("processASC_RiverDepth")
+    rs = model.runstack[len(model.runstack)-1]
+    assert rs.func == opx.ascToGDB
+
+def test_Operation_processASC_RiverDepth_args2():
+    hut = testHut()
+    model = hut["testmodel"]
+    model.addPredefinedOperation("processASC_RiverDepth")
+    rs = model.runstack[len(model.runstack)-1]
+    assert rs.args[0] == r"tests\data\MIKE\test_max_results_depth0.asc"
+
+def test_Operation_processASC_RiverDepth_args3():
+    hut = testHut()
+    model = hut["testmodel"]
+    model.addPredefinedOperation("processASC_RiverDepth")
+    rs = model.runstack[len(model.runstack)-1]
+    assert rs.args[1] == r"tests\data\test_output\testmodel.gdb"
+
+def test_Operation_processASC_RiverDepth_args4():
+    hut = testHut()
+    model = hut["testmodel"]
+    model.addPredefinedOperation("processASC_RiverDepth")
+    rs = model.runstack[len(model.runstack)-1]
+    assert rs.args[2] == "testmodel_River_Depth"
+
+# check it outputs raster to gdb
+@pytest.mark.arcpy
+def test_Operation_processASC_RiverDepth_1():
+    hut = testHut()
+    model = hut["testmodel"]
+    model.addPredefinedOperation("processASC_RiverDepth")
+    rs = model.runstack[len(model.runstack)-1]
+    rs.run()
+
+    arcpy.env.workspace = model.params["MODEL_GDB_PATH"]
+    rasterExists = arcpy.Exists(rs.args[2])
+
+    assert rasterExists
+
+
+# ---------------------------------------------------------------------------------------------------------------
 # Clip all rasters
 # ---------------------------------------------------------------------------------------------------------------
 
@@ -357,3 +403,71 @@ def test_Operation_set_CRS_args3():
     model.addPredefinedOperation("processCRS")
     rs = model.runstack[len(model.runstack)-1]
     assert rs.args[1] == r"ETRS 1989 UTM Zone 32N"
+
+@pytest.mark.arcpy
+def test_Operation_set_CRS_1():
+    hut = testHut()
+    model = hut["testmodel"]
+    model.addPredefinedOperation("processCRS")
+    rs = model.runstack[len(model.runstack)-1]
+    rs.run()
+
+    isCorrectCRS = True
+    for ras in arcpy.ListRasters("*", "All"):
+        if arcpy.Describe(ras).spatialReference.name != r"ETRS_1989_UTM_Zone_32N":
+            isCorrectCRS = False
+
+    assert isCorrectCRS
+
+# ---------------------------------------------------------------------------------------------------------------
+# Merges river and 2d into one
+# ---------------------------------------------------------------------------------------------------------------
+
+def test_Operation_merge_river_with_2d_args1():
+    hut = testHut()
+    model = hut["testmodel"]
+    model.addPredefinedOperation("processMergeRiver2DDepth")
+    rs = model.runstack[len(model.runstack)-1]
+    assert rs.func == opx.mergeRasters
+
+
+def test_Operation_merge_river_with_2d_args2():
+    hut = testHut()
+    model = hut["testmodel"]
+    model.addPredefinedOperation("processMergeRiver2DDepth")
+    rs = model.runstack[len(model.runstack)-1]
+    assert rs.args[0] == r"testmodel_2D_Depth"
+
+def test_Operation_merge_river_with_2d_args3():
+    hut = testHut()
+    model = hut["testmodel"]
+    model.addPredefinedOperation("processMergeRiver2DDepth")
+    rs = model.runstack[len(model.runstack)-1]
+    assert rs.args[1] == r"testmodel_River_Depth"
+
+def test_Operation_merge_river_with_2d_args4():
+    hut = testHut()
+    model = hut["testmodel"]
+    model.addPredefinedOperation("processMergeRiver2DDepth")
+    rs = model.runstack[len(model.runstack)-1]
+    assert rs.args[2] == r"testmodel_Full_Depth"
+
+def test_Operation_merge_river_with_2d_args5():
+    hut = testHut()
+    model = hut["testmodel"]
+    model.addPredefinedOperation("processMergeRiver2DDepth")
+    rs = model.runstack[len(model.runstack)-1]
+    assert rs.args[3] == r"tests\data\test_output\testmodel.gdb"
+
+@pytest.mark.arcpy
+def test_Operation_merge_river_with_2d_1():
+    hut = testHut()
+    model = hut["testmodel"]
+    model.addPredefinedOperation("processMergeRiver2DDepth")
+    rs = model.runstack[len(model.runstack)-1]
+    rs.run()
+
+    arcpy.env.workspace = model.params["MODEL_GDB_PATH"]
+    rasterExists = arcpy.Exists(rs.args[2])
+
+    assert rasterExists

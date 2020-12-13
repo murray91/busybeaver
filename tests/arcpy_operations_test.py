@@ -8,6 +8,7 @@ import filecmp
 import busybeaver.operations as opx
 from mikeio import Dfsu
 import numpy as np
+import arcpy
 
 # These tests require an arcpy license to run and can take long to run
 
@@ -50,10 +51,10 @@ def testHut():
 
     return hut
 
-
 # ---------------------------------------------------------------------------------------------------------------
 #File assertion tests
 # ---------------------------------------------------------------------------------------------------------------
+
 @pytest.mark.arcpy
 def test_compare_two_files1():
     hut = testHut()
@@ -98,7 +99,6 @@ def test_Operation_extract_direction2():
 # ---------------------------------------------------------------------------------------------------------------
 # Create geodatabase for model results, if not existing already
 # ---------------------------------------------------------------------------------------------------------------
-# Create geodatabase if it doesn't exist already
 
 def test_Operation_create_gdb_args1():
     hut = testHut()
@@ -126,3 +126,48 @@ def test_Operation_create_gdb1():
     model.runstack[len(model.runstack)-1].run()
 
     assert os.path.exists(model.params["MODEL_GDB_PATH"])
+
+# ---------------------------------------------------------------------------------------------------------------
+# Converts ASC depth files to gdb
+# ---------------------------------------------------------------------------------------------------------------
+
+def test_Operation_processASC_2DDepth_args1():
+    hut = testHut()
+    model = hut["testmodel"]
+    model.addPredefinedOperation("processASC_2DDepth")
+    rs = model.runstack[len(model.runstack)-1]
+    assert rs.func == opx.ascToGDB
+
+def test_Operation_processASC_2DDepth_args2():
+    hut = testHut()
+    model = hut["testmodel"]
+    model.addPredefinedOperation("processASC_2DDepth")
+    rs = model.runstack[len(model.runstack)-1]
+    assert rs.args[0] == r"tests\data\MIKE\test_max_results_depth0.asc"
+
+def test_Operation_processASC_2DDepth_args3():
+    hut = testHut()
+    model = hut["testmodel"]
+    model.addPredefinedOperation("processASC_2DDepth")
+    rs = model.runstack[len(model.runstack)-1]
+    assert rs.args[1] == r"tests\data\test_output\testmodel.gdb"
+
+def test_Operation_processASC_2DDepth_args4():
+    hut = testHut()
+    model = hut["testmodel"]
+    model.addPredefinedOperation("processASC_2DDepth")
+    rs = model.runstack[len(model.runstack)-1]
+    assert rs.args[2] == "testmodel_2D_Depth"
+
+@pytest.mark.arcpy
+def test_Operation_processASC_2DDepth_1():
+    hut = testHut()
+    model = hut["testmodel"]
+    model.addPredefinedOperation("processASC_2DDepth")
+    rs = model.runstack[len(model.runstack)-1]
+    rs.run()
+
+    arcpy.env.workspace = model.params["MODEL_GDB_PATH"]
+    rasterExists = arcpy.Exists(rs.args[2])
+
+    assert rasterExists

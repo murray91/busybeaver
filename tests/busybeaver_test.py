@@ -117,7 +117,7 @@ def test_Hut_load_config_operations1():
     for operation in model.runstack:
         funcs.append(operation.func)
 
-    assert OPERATIONS["process2DDepth"][0] in funcs
+    assert OPERATIONS["processASC_2DDepth"][0] in funcs
 
 def test_Hut_load_config_operations2():
     errors = []
@@ -128,10 +128,10 @@ def test_Hut_load_config_operations2():
     for operation in model.runstack:
         funcs.append(operation.name)
 
-    if not "process2DDepth" in funcs:
-        errors.append("Error adding process2DDepth operation.")
-    if not "process2DDirection" in funcs:
-        errors.append("Error adding process2DDirection operation.")
+    if not "processASC_2DDepth" in funcs:
+        errors.append("Error adding processASC_2DDepth operation.")
+    if not "processASC_2DDirection" in funcs:
+        errors.append("Error adding processASC_2DDirection operation.")
     if not "processFullDepth" in funcs:
         errors.append("Error adding processFullDepth operation.")
     if not "processClipVelocity" in funcs:
@@ -147,7 +147,7 @@ def test_Hut_load_config_operations3():
     for operation in model.runstack:
         op_names.append(operation.name)
 
-    assert "process2DVelocity" not in op_names
+    assert "processASC_2DVelocity" not in op_names
 
 def test_Hut_load_config_result_files1():
     testhut = bb.Hut(config_file)
@@ -258,18 +258,18 @@ def test_Model_add_param_2():
 def test_Model_add_operation_to_run_stack1():
 
     testhut = bb.Hut(config_file)
-    operation = "process2DDepth"
+    operation = "processASC_2DDepth"
     testhut["newModel1"].addPredefinedOperation(operation)
 
-    assert testhut["newModel1"].runstack[0].name == "process2DDepth"
+    assert testhut["newModel1"].runstack[0].name == "processASC_2DDepth"
 
 def test_Model_add_operation_to_run_stack2():
 
     testhut = bb.Hut(config_file)
-    operation = "process2DDepth"
+    operation = "processASC_2DDepth"
     testhut["newModel1"].addPredefinedOperation(operation)
 
-    assert testhut["newModel1"].runstack[0].func == OPERATIONS["process2DDepth"][0]
+    assert testhut["newModel1"].runstack[0].func == OPERATIONS["processASC_2DDepth"][0]
 
 def test_Model_add_operation_to_run_stack4():
 

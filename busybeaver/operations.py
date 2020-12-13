@@ -64,30 +64,25 @@ def createGDB(gdb_path, gdb_name):
     
     return True
 
+# ascToGDB
+# Converts an asc file to a raster and adds it to gdb. Overwrites if already exists.        
+#
+# Example usage:
+#   ascToGDB("myascfile.asc", "somegdb.gdb")
+# 
+def ascToGDB(asc_file, gdb_name, raster_name = None):
 
-# process2DDepth
-# Insert description of function
-# Example usage: ...
-def process2DDepth(*args):
-    return None
+    # convert relative paths to absolute to work with arcpy function
+    asc_file = os.path.abspath(asc_file)
+    arcpy.env.workspace = gdb_name
 
-# process2DVelocity
-# Insert description of function
-# Example usage: ...
-def process2DVelocity(*args):
-    return None
+    # use same raster name as asc file if not specified
+    if raster_name == None:
+        gdb_raster_name = os.path.splitext(os.path.basename(asc_file))[0]
 
-# process2DDirection
-# Insert description of function
-# Example usage: ...
-def process2DDirection(*args):
-    return None
+    arcpy.ASCIIToRaster_conversion(asc_file, raster_name, data_type="FLOAT")
 
-# processRiverDepth
-# Insert description of function
-# Example usage: ...
-def processRiverDepth(*args):
-    return None
+    logging.info("Created raster: {}".format(raster_name))
 
 # processFullDepth
 # Insert description of function

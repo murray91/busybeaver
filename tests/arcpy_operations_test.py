@@ -11,7 +11,7 @@ import numpy as np
 
 # comment this out if testing without arcpy
 # also use pytest -m "not arcpy"
-import arcpy 
+#import arcpy 
 
 # These tests require an arcpy license to run and can take long to run
 

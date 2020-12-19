@@ -23,8 +23,10 @@ PROCESSING_FILE_TYPES = {
 # Standardized names for other model parameters which are not files
 MODEL_PARAMETERS = {
     "MODEL_NAME", # Name/alias of the model
+    "MODEL_PATH", # Path to model output folder
     "MODEL_GDB_PATH", # Path to the model's GDB
     "DIRECTION_TIMESTEP", # Integer timestep to extract direction from dfsu in model
+    "2D_DEPTH_TIF_NAME", # Name of 2d depth raster (exclusing river) in tif format
     "2D_DEPTH_GDB_NAME", # Name of 2d depth raster (exclusing river) in gdb
     "2D_VELOCITY_GDB_NAME", # Name of 2d velocity raster (exclusing river) in gdb
     "2D_DIRECTION_GDB_NAME", # Name of 2d direction raster (excluding river) in gdb
@@ -43,7 +45,8 @@ OPERATIONS = {
     "extractDirectionFromDfsu" :    [opx.extractDirectionFromDfsu, 
                                     "DFSU_REULTS_ANIMATED", "DFSU_RESULTS_DIRECTION", "DIRECTION_TIMESTEP"],
     "createGDB" : [opx.createGDB, "MODEL_GDB_PATH", "MODEL_NAME"], 
-    "processASC_2DDepth" : [opx.ascToGDB, "DEPTH_2D_ASC", "MODEL_GDB_PATH", "2D_DEPTH_GDB_NAME"],        
+    "processASC_2DDepth" : [opx.ascToGDB, "DEPTH_2D_ASC", "MODEL_GDB_PATH", "2D_DEPTH_GDB_NAME"],    
+    "processTIF_2DDepth" : [opx.dfsuToTif, "DFSU_RESULTS_MAX", "Maximum water depth", 0, "2D_DEPTH_TIF_NAME"],  
     "processASC_2DVelocity" : [opx.ascToGDB, "VELOCITY_2D_ASC", "MODEL_GDB_PATH", "2D_VELOCITY_GDB_NAME"],      
     "processASC_2DDirection" : [opx.ascToGDB, "DIRECTION_2D_ASC", "MODEL_GDB_PATH", "2D_DIRECTION_GDB_NAME"],     
     "processASC_RiverDepth" : [opx.ascToGDB, "DEPTH_RIVER_ASC", "MODEL_GDB_PATH", "RIVER_DEPTH_GDB_NAME"],        

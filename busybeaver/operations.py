@@ -2,6 +2,8 @@ import numpy as np
 from mikeio import Dfsu
 from mikeio.eum import ItemInfo, EUMType, EUMUnit
 from mikeio import Dataset
+import gdal
+from osgeo import ogr
 import os
 import logging
 
@@ -162,5 +164,69 @@ def mergeRasters(raster1, raster2, merged_name, gdb_name):
     arcpy.MosaicToNewRaster_management("{};{}".format(raster2, raster1), gdb_name, merged_name,
                                    "", "32_BIT_FLOAT", "1", "1",
                                    "LAST", "LAST")
+
+    return True
+
+# dfsuToTif
+# Converts an dfsu file to a tif raster. Overwrites if already exists.        
+#
+# Example usage:
+#   dfsuToTiff("mydfs.dfsu" ,"Total water depth", 30, "mytif.tif")
+# 
+def dfsuToTif(dfsu_file, item, time_step, tif_file):
+
+    # get absolute paths to files
+    dfsu_file = os.path.abspath(dfsu_file)
+    tif_file = os.path.abspath(tif_file)
+
+    # open dfsu, get points, then close to save memory
+    dfs = Dfsu(dfsu_file)
+    grid = dfs.get_overset_grid(dxdy=1)
+    coords = dfs.element_coordinates[:,:2]
+    ds = dfs.read(item, time_step)
+    data = ds.data[0].transpose()
+    points = np.append(coords, data, axis=1)
+    dfs = None
+    ds = None
+
+    # write points to temporary shapefile
+    driver = ogr.GetDriverByName("ESRI Shapefile")
+    ds = driver.CreateDataSource('temp_points.shp')
+    layer = ds.CreateLayer("points", srs=None, geom_type=ogr.wkbPoint)
+    layer.CreateField(ogr.FieldDefn("Elevation", ogr.OFTReal))
+    for point in points:
+        feature = ogr.Feature(layer.GetLayerDefn())
+        feature.SetField("Elevation", point[2])
+        pnt = ogr.Geometry(ogr.wkbPoint)
+        pnt.AddPoint(point[0], point[1])
+        feature.SetGeometry(pnt)
+        layer.CreateFeature(feature)
+        feature = None
+    ds = None
+
+    # delete any old tif files
+    try:
+        os.remove(tif_file)
+    except OSError:
+        pass
+
+    # interpolate points to grid and write to shapefile
+    option = gdal.GridOptions(
+        format='GTiff', 
+        outputType=gdal.gdalconst.GDT_Float32,
+        outputBounds=[grid.x0, grid.y1, grid.x1, grid.y0], 
+        width=grid.nx+2, 
+        height=grid.ny,
+        algorithm='invdist:power=2.0:smoothing=0.0:radius1=0.0:radius2=0.0:angle=0.0:max_points=0:min_points=0:nodata=-9999',
+        #algorithm='invdistnn:power=1.0:smoothing=0.0:radius=15.0:max_points=25:min_points=0:nodata=-9999',
+        zfield='Elevation',
+        noData=-9999)
+    out = gdal.Grid(tif_file, 'temp_points.shp', options=option) 
+    out = None
+
+    # clean up temporary shapefile
+    driver.DeleteDataSource('temp_points.shp')
+
+    logging.info("Created raster: {}".format(tif_file))
 
     return True

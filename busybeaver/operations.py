@@ -225,7 +225,7 @@ def dfsuToTif(dfsu_file, item, time_step, tif_file):
     out = None
 
     # clean up temporary shapefile
-    driver.DeleteDataSource('temp_points.shp')
+    #driver.DeleteDataSource('temp_points.shp')
 
     logging.info("Created raster: {}".format(tif_file))
 

@@ -142,3 +142,24 @@ def interp_grid(grid, element_coords, dfs_data):
         z.append(z_int)
 
     return z
+
+def write_to_shp(filename, grid, data):
+
+    
+
+    new_dataset = rasterio.open(
+        filename,
+        'w',
+        driver='GTiff',
+        height= grid.ny,
+        width= grid.nx,
+        count=1,
+        dtype=,
+        crs=,
+        transform=transform
+    )
+
+    new_dataset.write(Z, 1)
+    new_dataset.close()
+
+    return None

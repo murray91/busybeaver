@@ -198,7 +198,7 @@ def cleanRasters(gdb_name, depth, velocity, direction, depth_final, velocity_fin
     # Delete all other rasters
     logging.info("Deleting all rasters which are not final.")
     for ras in arcpy.ListRasters("*", "All"):
-        if (ras not depth_final) and (ras not velocity_final) and (ras not direction_final):
+        if ras != depth_final and ras != velocity_final and ras != direction_final:
             logging.info("Deleting raster {}...".format(ras))
             arcpy.Delete_management(ras)
 

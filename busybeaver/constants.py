@@ -28,10 +28,13 @@ MODEL_PARAMETERS = {
     "DIRECTION_TIMESTEP", # Integer timestep to extract direction from dfsu in model
     "2D_DEPTH_TIF_NAME", # Name of 2d depth raster (exclusing river) in tif format
     "2D_DEPTH_GDB_NAME", # Name of 2d depth raster (exclusing river) in gdb
-    "2D_VELOCITY_GDB_NAME", # Name of 2d velocity raster (exclusing river) in gdb
-    "2D_DIRECTION_GDB_NAME", # Name of 2d direction raster (excluding river) in gdb
-    "RIVER_DEPTH_GDB_NAME", # Name of 2d river depth raster in gdb.
-    "FULL_DEPTH_GDB_NAME", # Name of full depth raster (2d and river merged)
+    "2D_VELOCITY_GDB_NAME", # Name of 2d velocity raster (exclusing river) in gdb ... unclipped
+    "2D_DIRECTION_GDB_NAME", # Name of 2d direction raster (excluding river) in gdb ... unclipped
+    "RIVER_DEPTH_GDB_NAME", # Name of 2d river depth raster in gdb ... unclipped
+    "FULL_DEPTH_GDB_NAME", # Name of full depth raster (2d and river merged) ... unclipped
+    "FINAL_DEPTH_GDB_NAME", # Final name of depth raster after clipping
+    "FINAL_VELOCITY_GDB_NAME", # Final name of velocity raster after clipping
+    "FINAL_DIRECTION_GDB_NAME", # Final name of direction raster after clipping
     "CLIP_FIELD", # Name of column in attribute table of MODEL_BOUNDARY_POLYGON
     "CLIP_VALUE", # Value in CLIP_FIELD to use as clip olygon
     "CRS", # Coordinate system string for all rasters (e.g. 'ETRS 1989 UTM Zone 32N')
@@ -55,5 +58,8 @@ OPERATIONS = {
     "processCRS" : [opx.setCRS, "MODEL_GDB_PATH", "CRS"],  
     "processMergeRiver2DDepth" : [opx.mergeRasters, "2D_DEPTH_GDB_NAME", "RIVER_DEPTH_GDB_NAME", 
                                 "FULL_DEPTH_GDB_NAME", "MODEL_GDB_PATH"],
+    "processcleanRasters" : [opx.cleanRasters,  "MODEL_GDB_PATH", 
+                                                "FULL_DEPTH_GDB_NAME", "2D_VELOCITY_GDB_NAME", "2D_DIRECTION_GDB_NAME",
+                                                "FINAL_DEPTH_GDB_NAME", "FINAL_VELOCITY_GDB_NAME", "FINAL_DIRECTION_GDB_NAME"],
     "OP_FOR_TESTING_ONLY" : [opx.FOR_TESTING_ONLY, "DEPTH_2D_ASC", "MODEL_BOUNDARY_POLYGON"]
 }

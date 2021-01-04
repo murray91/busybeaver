@@ -24,20 +24,21 @@ def FOR_TESTING_ONLY(*args):
 # Assumes
 #   -input dfsu has Current direction
 #   -timestep specified exists
-#   -Current direction unit is radians
+#   -Current direction unit is radians, but outputs to degrees
 #  
 def extractDirectionFromDfsu(input_dfsu, output_dfsu, timestep):
 
     # Make sure timestep is an integer and not string
     timestep = int(timestep)
 
-    # Open dfsu and read specified timestep
+    # Open dfsu and read specified timestep, then convert rads to degs
     dfs = Dfsu(input_dfsu)
     ds = dfs.read(time_steps=timestep)
+    direction = np.rad2deg(ds["Current direction"])
 
     # Create new dataset for the specified timestep
-    items = [ItemInfo("Current direction", EUMType.Current_Direction, EUMUnit.radian)]
-    newds = Dataset([ds["Current direction"]], ds.time, items)
+    items = [ItemInfo("Current direction", EUMType.Current_Direction, EUMUnit.degree)]
+    newds = Dataset([direction], ds.time, items)
 
     # Write direction to new dfsu
     dfs.write(output_dfsu, newds)
@@ -141,7 +142,7 @@ def setCRS(gdb_name, crs):
 
     # set coordinate system for all rasters
     for ras in arcpy.ListRasters("*", "All"):
-        logging.info("Defining coordinate system for raster {}...",format(ras))
+        logging.info("Defining coordinate system for raster {}...".format(ras))
         arcpy.DefineProjection_management(ras, sr)
 
     return True
@@ -167,6 +168,42 @@ def mergeRasters(raster1, raster2, merged_name, gdb_name):
 
     return True
 
+# cleanRasters
+# Renames latest rasters to their final name and removes all others rasters from GDB
+#
+# Example usage:
+#   cleanRasters("gdb_with_rasters.gdb")
+# 
+def cleanRasters(gdb_name, depth, velocity, direction, depth_final, velocity_final, direction_final):
+
+    import arcpy
+    # convert relative paths to absolute to work with arcpy function
+    gdb_name = os.path.abspath(gdb_name)
+    arcpy.env.workspace = gdb_name
+
+    # check if clipped rasters exist, and if so, use that as final raster
+    if arcpy.Exists("{}_CLIPPED".format(depth)):
+        depth = "{}_CLIPPED".format(depth)
+    if arcpy.Exists("{}_CLIPPED".format(velocity)):
+        velocity = "{}_CLIPPED".format(velocity)
+    if arcpy.Exists("{}_CLIPPED".format(direction)):
+        direction = "{}_CLIPPED".format(direction)
+
+    # Rename rasters to their final names
+    logging.info("Renaming final depth, velocity, and direction rasters.")
+    arcpy.Rename_management(depth, depth_final)
+    arcpy.Rename_management(velocity, velocity_final)
+    arcpy.Rename_management(direction, direction_final)
+
+    # Delete all other rasters
+    logging.info("Deleting all rasters which are not final.")
+    for ras in arcpy.ListRasters("*", "All"):
+        if (ras not depth_final) and (ras not velocity_final) and (ras not direction_final):
+            logging.info("Deleting raster {}...".format(ras))
+            arcpy.Delete_management(ras)
+
+    return True
+
 # dfsuToTif
 # Converts an dfsu file to a tif raster. Overwrites if already exists.        
 #
@@ -181,8 +218,17 @@ def dfsuToTif(dfsu_file, item, time_step, tif_file):
 
     # open dfsu, get points, then close to save memory
     dfs = Dfsu(dfsu_file)
-    grid = dfs.get_overset_grid(dxdy=1)
     coords = dfs.element_coordinates[:,:2]
+
+    # get custom nx ny based on what MIKE Zero gives
+    x0 = np.min(coords, axis = 0)[0]
+    y0 = np.min(coords, axis = 0)[1]
+    x1 = np.max(coords, axis = 0)[0]
+    y1 = np.max(coords, axis = 0)[1]
+    nx = round((x1-x0)/19*20)
+    ny = round((y1-y0)/19*20)
+    grid = dfs.get_overset_grid(shape=(nx, ny))
+    
     ds = dfs.read(item, time_step)
     data = ds.data[0].transpose()
     points = np.append(coords, data, axis=1)
@@ -215,10 +261,11 @@ def dfsuToTif(dfsu_file, item, time_step, tif_file):
         format='GTiff', 
         outputType=gdal.gdalconst.GDT_Float32,
         outputBounds=[grid.x0, grid.y1, grid.x1, grid.y0], 
-        width=grid.nx+2, 
+        width=grid.nx, 
         height=grid.ny,
-        algorithm='invdist:power=2.0:smoothing=0.0:radius1=0.0:radius2=0.0:angle=0.0:max_points=0:min_points=0:nodata=-9999',
-        #algorithm='invdistnn:power=1.0:smoothing=0.0:radius=15.0:max_points=25:min_points=0:nodata=-9999',
+        #algorithm='invdist:power=2.0:smoothing=0.5:radius1=25.0:radius2=25.0:angle=0.0:max_points=0:min_points=0:nodata=-9999',
+        algorithm='invdistnn:power=2.0:smoothing=0:radius=25.0:max_points=0:min_points=0:nodata=-9999',
+        #algorithm='average:radius1=1:radius2=1',
         zfield='Elevation',
         noData=-9999)
     out = gdal.Grid(tif_file, 'temp_points.shp', options=option) 

@@ -100,6 +100,8 @@ class Hut:
                     model.addParam(*a)
                 elif a[0] in OPERATIONS and a[1] == "True":
                     model.addPredefinedOperation(a[0])
+                elif a[0] in OPERATIONS and a[1] == "False":
+                    continue
                 else:
                     logging.info("Skipped unknown parameter in config file: {}.".format(a[0]))
         

@@ -152,3 +152,19 @@ def test_interp_point_1():
     z = bbinterp.interp_point(interp_point, quad0, quad1, quad2, quad3)
 
     assert round(z[2],6) == 0.055493
+
+# Test writing to shapefile interp grid
+# -----
+@pytest.mark.interp
+def test_write_shp_1():
+    
+    dfs = Dfsu(r"tests\data\MIKE\test_max_results.dfsu")
+    ds = dfs.read("Maximum water depth")
+
+    g = dfs.get_overset_grid(dxdy=1)
+
+    z = bbinterp.interp_grid(g, dfs.element_coordinates, ds.data[0][0])
+
+    bbinterp.write_to_shp(r"tests\data\test_output\bilinear.tif", grid, z)
+    
+    assert True

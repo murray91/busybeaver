@@ -136,16 +136,14 @@ def interp_grid(grid, element_coords, dfs_data):
     for pnt in grid.xy:
 
         # get nearest 4 points
-        interpolants = get_interpolants(pnt, points)
+        interpolants = get_interpolants(pnt, element_coords, dfs_data)
         # interpolate grid point based on 4 nearest points
         z_int = interp_point(pnt, interpolants[0], interpolants[1], interpolants[2], interpolants[3])
         z.append(z_int)
 
     return z
 
-def write_to_shp(filename, grid, data):
-
-    
+def write_to_shp(filename, grid, z):
 
     new_dataset = rasterio.open(
         filename,
@@ -154,12 +152,11 @@ def write_to_shp(filename, grid, data):
         height= grid.ny,
         width= grid.nx,
         count=1,
-        dtype=,
-        crs=,
-        transform=transform
+        dtype=z.dtype,
+        crs=rasterio.crs.CRS.from_string("ETRS_1989_UTM_Zone_32N")
     )
 
-    new_dataset.write(Z, 1)
+    new_dataset.write(z, 1)
     new_dataset.close()
 
     return None

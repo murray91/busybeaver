@@ -12,22 +12,14 @@ class Hut:
     Main class for setting up single/batch post processing
 
     Usage example:
-    process_manager = Hut("config.ini")
+    process_manager = Hut()
     """
-    def __init__(self, config_file = None):
+    def __init__(self):
       
         logging.info("Created new Hut.")
-        self.config_file = config_file
         self.models = []
-        self._output_folder = None
-        self.crs = None
 
-        if self.config_file != None:
-            self.loadConfig(self.config_file)
-
-    # Allows returning model object by indexing the hut by with model name
-    #   e.g. model = myhut["modelname"]
-    #   (same as doing myhut.models["modelname"])
+    # Make huts iterable over models in self.models
     def __getitem__(self, index):
         if isinstance(index, str):
             for model in self.models:
@@ -45,101 +37,10 @@ class Hut:
     def __next__(self):
         pass
 
-    @property
-    def output_folder(self):
-        return self._output_folder
-
-    @output_folder.setter
-    def output_folder(self, value):
-        self._output_folder = value
+    # sets the same parameter for many models to a value
+    def setAll(self, param, value):
         for model in self.models:
-            model.output_folder = value
-
-
-    def loadConfig(self, config_file):
-        """
-        Loads a configuration .ini file into the hut.
-        """
-        logging.info("Loading config file into Hut...")
-
-        # Delete any old models
-        if not self.models == []:
-            logging.info("Removed previous models in Hut while loading config file.")
-            self.models = []
-
-        # Read the config file
-        logging.info("Reading config file...")
-        config = configparser.RawConfigParser()
-        config.optionxform=str
-        config.read(self.config_file)
-
-        # Load general results
-        logging.info("Applying general settings to Hut...")
-        self.output_folder = config.get("setup", "default_output_path")
-        self.crs = config.get("setup", "crs")
-
-        # Create empty Model objects for each model
-        logging.info("Adding models to Hut...")
-        models = config.sections()[1:]
-        for name in models:
-            new_model = Model(name)
-            self.models.append(new_model)
-            self.models[len(self.models)-1].output_folder = self.output_folder
-            logging.info("Added {} to Hut.".format(new_model.name))
-
-        # Import filenames / operations
-        logging.info("Importing parameters into Hut models...")
-        for model in self.models:
-            attributes = config.items(model.name)
-            for a in attributes:
-                if a[0] in RESULT_FILE_TYPES:
-                    model.addFile(*a)
-                elif a[0] in PROCESSING_FILE_TYPES:
-                    model.addFile(*a)
-                elif a[0] in MODEL_PARAMETERS:
-                    model.addParam(*a)
-                elif a[0] in OPERATIONS and a[1] == "True":
-                    model.addPredefinedOperation(a[0])
-                elif a[0] in OPERATIONS and a[1] == "False":
-                    continue
-                else:
-                    logging.info("Skipped unknown parameter in config file: {}.".format(a[0]))
-        
-        logging.info("Config file loaded.")
-
-    # Allows saving the hut configuration to a new config file
-    def saveConfig(self, new_file_path):
-
-        logging.info("Saving Hut to new config file...")
-        parser = configparser.RawConfigParser()
-        parser.optionxform = str
-
-        logging.debug("Saving setup attributes.")
-        parser.add_section("setup")
-        parser.set("setup", "default_output_path", self.output_folder)
-        parser.set("setup", "crs", self.crs)
-
-        for model in self.models:
-            parser.add_section(model.name)
-            for result_type, result_path in model.results.items():
-                parser.set(model.name, result_type, result_path)
-                logging.debug("Saving attribute {} for {} as {}".format(result_type, model.name, result_path))
-            for processing_type, processing_path in model.pfiles.items():
-                parser.set(model.name, processing_type, processing_path)
-                logging.debug("Saving attribute {} for {} as {}".format(processing_type, model.name, processing_path))
-            for param, value in model.params.items():
-                parser.set(model.name, param, value)
-                logging.debug("Saving attribute {} for {} as {}".format(param, model.name, value))
-            for operation in model.runstack:
-                parser.set(model.name, operation.name, "True")
-                logging.debug("Saving attribute {} for {} as {}".format(operation.name, model.name, "True"))
-        logging.debug("New configuration saved in memory, now writing to file...")
-
-        f = open(new_file_path, "w")
-        parser.write(f)
-        f.close()
-
-        logging.info("Saved configuration to config file: {}.".format(new_file_path))
+            model.params[param] = value
     
     def runAll(self):
         logging.info("Starting to run operations for all models.")
@@ -147,8 +48,6 @@ class Hut:
             logging.info("Running operations for {}...".format(model.name))
             for opx in model.runstack:
                 opx.run()
-
-        return True
 
 # Allows iterating over Hut to get models      
 class HutIterator:
@@ -171,83 +70,48 @@ class Model:
     Usage example:
     cool_model = Model("Name of model")
 
-    Note: Model instances are intended to be initialized through the Hut object
     """
     def __init__(self, model_name):
-
-        self.output_folder = None
-        self.results = {}
-        self.pfiles = {}
-        self.params = {"MODEL_NAME":model_name}
-        self.name = model_name
-
-        # Stores operations to be run as a list of lists, inner list format is [function_name, args]
-        self.runstack = []
-
-        self.setupDefaults()
-
+        
         logging.info("Created model: {}.".format(self.name))
-
-    # Setup default parameters
-    def setupDefaults(self):
-        self.params["2D_DEPTH_GDB_NAME"] = "{}_2D_Depth".format(self.name)
-        self.params["2D_VELOCITY_GDB_NAME"] = "{}_2D_Velocity".format(self.name)
-        self.params["2D_DIRECTION_GDB_NAME"] = "{}_2D_Direction".format(self.name)
-        self.params["RIVER_DEPTH_GDB_NAME"] = "{}_River_Depth".format(self.name)
-        self.params["FULL_DEPTH_GDB_NAME"] = "{}_Full_Depth".format(self.name)
-
-    # Adds a file to either self.results or self.pfiles
-    def addFile(self, file_type, file_path):
-
-        if (file_type in RESULT_FILE_TYPES):
-            self.results[file_type] = file_path
-            logging.debug("Added result file to {}: {}".format(self.name, file_type))
-        elif (file_type in PROCESSING_FILE_TYPES):
-            self.pfiles[file_type] = file_path
-            logging.debug("Added processing file to {}: {}".format(self.name, file_type))
-        else:
-            logging.error("{} not a valid file type. Check constants.py for valid types.".format(file_type))
-
-    # Adds a parameter to self.params
-    def addParam(self, param, value):
-        if param in MODEL_PARAMETERS:
-            self.params[param] = value
-            logging.debug("Added parameter to {}: {}".format(self.name, param))
-        else:
-            logging.error("{} not a valid parameter type. Check constants.py for valid types.".format(param))
+        self.name = model_name
+        self.runstack = []
+        self.params = {
+                "DFSU_REULTS_ANIMATED",     # animated dfsu results from MIKE
+                "DFSU_RESULTS_MAX",         # max dfsu results from MIKE
+                "DEPTH_2D_ASC",             # MIKE 2d max depth in asc format
+                "DEPTH_RIVER_ASC",          # MIKE river max depth in asc format
+                "VELOCITY_2D_ASC",          # MIKE 2d max velocity in asc format
+                "DIRECTION_2D_ASC"          # MIKE 2d direction in asc format
+                "MODEL_BOUNDARY_POLYGON",   # Boundaries to clip model results to
+                "DEPTH_RIVER_MASK_POLYGON", # Polygon areas to be removed from DEPTH_RIVER
+                "DFSU_RESULTS_DIRECTION",   # Output location for extractDirectionFromDfsu
+                "MODEL_NAME",               # Name/alias of the model
+                "MODEL_PATH",               # Path to model output folder
+                "MODEL_GDB_PATH",           # Path to the model's GDB
+                "DIRECTION_TIMESTEP",       # Integer timestep to extract direction from dfsu in model
+                "2D_DEPTH_TIF_NAME",        # Name of 2d depth raster (exclusing river) in tif format
+                "2D_DEPTH_GDB_NAME",        # Name of 2d depth raster (exclusing river) in gdb
+                "2D_VELOCITY_GDB_NAME",     # Name of 2d velocity raster (exclusing river) in gdb ... unclipped
+                "2D_DIRECTION_GDB_NAME",    # Name of 2d direction raster (excluding river) in gdb ... unclipped
+                "RIVER_DEPTH_GDB_NAME",     # Name of 2d river depth raster in gdb ... unclipped
+                "FULL_DEPTH_GDB_NAME",      # Name of full depth raster (2d and river merged) ... unclipped
+                "FINAL_DEPTH_GDB_NAME",     # Final name of depth raster after clipping
+                "FINAL_VELOCITY_GDB_NAME",  # Final name of velocity raster after clipping
+                "FINAL_DIRECTION_GDB_NAME", # Final name of direction raster after clipping
+                "CLIP_FIELD",               # Name of column in attribute table of MODEL_BOUNDARY_POLYGON
+                "CLIP_VALUE",               # Value in CLIP_FIELD to use as clip olygon
+                "CRS",                      # Coordinate system string for all rasters (e.g. 'ETRS 1989 UTM Zone 32N')
+        }
 
     # Adds a raw python function and arguments to runstack
-    def addOperation(self, func, *args):
-        self.runstack.append(Operation("CUSTOM_OPERATION", func, *args))
-        logging.debug("Added operation to runstack of {}: {}".format(self.name, func))
-
-    # Adds a function in OPERATIONS to runstack, auto-filling arguments
-    def addPredefinedOperation(self, operation_name):
-        if operation_name in OPERATIONS:
-            args = []
-            for arg in OPERATIONS[operation_name][1:]:
-                args.append(self.getValue(arg))
-            if None in args:
-                logging.error("Arguments for operation {} in model {} missing.".format(operation_name,self.name))
-            self.runstack.append(Operation(operation_name, OPERATIONS[operation_name][0], *args))
-        else:
-            logging.error("{} not a valid operation type. Check constants.py for valid types.".format(operation_name))
-
-    # Returns the value of an attribute
-    def getValue(self, attribute):
-        if attribute in self.results:
-            return self.results[attribute]
-        elif attribute in self.pfiles:
-            return self.pfiles[attribute]
-        elif attribute in self.params:
-            return self.params[attribute]
-        else:
-            logging.error("Could not find attribute type {} in model {}.".format(attribute, self.name))
-            return None
+    def addOperation(self, name, func, *args):
+        self.runstack.append(Operation(name, func, *args))
+        logging.debug("Added operation to runstack of model {}: {}".format(self.name, name))
 
 class Operation:
     """
-    A class for holding information related to a single operation
+    A class for holding information related to a single function to be run.
 
     Usage example:
     my_operation = Operation("operation_name", function, *args)

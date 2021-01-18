@@ -1,11 +1,9 @@
 import busybeaver as bb
-import configparser
-from busybeaver.constants import *
 import os
 import shutil
 import pytest
 import filecmp
-import busybeaver.operations as opx
+import busybeaver.processes as proc
 from mikeio import Dfsu
 import numpy as np
 import gdal
@@ -21,7 +19,7 @@ def testHut():
     hut = bb.Hut()
     hut.models.append(bb.Model("testmodel"))
 
-    result_files = {
+    params = {
         "DFSU_REULTS_ANIMATED" : r"tests\data\MIKE\test_animated_results.dfsu",
         "DFSU_RESULTS_MAX" : r"tests\data\MIKE\test_max_results.dfsu",     
         "DEPTH_2D_ASC" : r"tests\data\MIKE\test_max_results_depth0.asc",
@@ -29,15 +27,9 @@ def testHut():
         "DEPTH_RIVER_ASC" : r"tests\data\MIKE\test_max_results_depth0.asc",
         "VELOCITY_2D_ASC" : r"tests\data\MIKE\test_max_results_speed0.asc",
         "DIRECTION_2D_ASC" : r"tests\data\MIKE\test_animated_results_direction32.asc",
-    }
-
-    process_files = {
         "MODEL_BOUNDARY_POLYGON" : r"tests\data\clip_polygons.shp",
         "DEPTH_RIVER_MASK_POLYGON" : None, 
         "DFSU_RESULTS_DIRECTION" : r"tests\data\test_output\test_animed_results_direction.dfsu",
-    }
-
-    params = {
         "MODEL_NAME" : "testmodel",
         "MODEL_GDB_PATH" : r"tests\data\test_output\testmodel.gdb",
         "DIRECTION_TIMESTEP" : 32,     
@@ -47,11 +39,7 @@ def testHut():
     }
 
     model = hut["testmodel"]
-    model.results.update(result_files)
-    model.pfiles.update(process_files)
     model.params.update(params)
-    hut.output_folder = r"tests\data\test_output"
-    hut.saveConfig(r"tests\data\test_output\testhut.ini")
 
     return hut
 

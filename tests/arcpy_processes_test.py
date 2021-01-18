@@ -1,17 +1,16 @@
 import busybeaver as bb
 import configparser
-from busybeaver.constants import *
 import os
 import shutil
 import pytest
 import filecmp
-import busybeaver.operations as opx
+import busybeaver.processes as proc
 from mikeio import Dfsu
 import numpy as np
 
 # comment this out if testing without arcpy
 # also use pytest -m "not arcpy"
-import arcpy 
+#import arcpy 
 
 # These tests require an arcpy license to run and can take long to run
 
@@ -23,22 +22,17 @@ def testHut():
     hut = bb.Hut()
     hut.models.append(bb.Model("testmodel"))
 
-    result_files = {
+    params = {
         "DFSU_REULTS_ANIMATED" : r"tests\data\MIKE\test_animated_results.dfsu",
         "DFSU_RESULTS_MAX" : r"tests\data\MIKE\test_max_results.dfsu",     
         "DEPTH_2D_ASC" : r"tests\data\MIKE\test_max_results_depth0.asc",
+        "2D_DEPTH_TIF_NAME" : r"tests\data\test_output\max_depth.tif",
         "DEPTH_RIVER_ASC" : r"tests\data\MIKE\test_max_results_depth0.asc",
         "VELOCITY_2D_ASC" : r"tests\data\MIKE\test_max_results_speed0.asc",
         "DIRECTION_2D_ASC" : r"tests\data\MIKE\test_animated_results_direction32.asc",
-    }
-
-    process_files = {
         "MODEL_BOUNDARY_POLYGON" : r"tests\data\clip_polygons.shp",
         "DEPTH_RIVER_MASK_POLYGON" : None, 
         "DFSU_RESULTS_DIRECTION" : r"tests\data\test_output\test_animed_results_direction.dfsu",
-    }
-
-    params = {
         "MODEL_NAME" : "testmodel",
         "MODEL_GDB_PATH" : r"tests\data\test_output\testmodel.gdb",
         "DIRECTION_TIMESTEP" : 32,     
@@ -48,12 +42,7 @@ def testHut():
     }
 
     model = hut["testmodel"]
-    model.results.update(result_files)
-    model.pfiles.update(process_files)
     model.params.update(params)
-    model.addPredefinedOperation("extractDirectionFromDfsu")
-    hut.output_folder = r"tests\data\test_output"
-    hut.saveConfig(r"tests\data\test_output\testhut.ini")
 
     return hut
 
@@ -81,10 +70,10 @@ def test_compare_two_files2():
 # Extract direction at specific timestep
 # ---------------------------------------------------------------------------------------------------------------
 @pytest.mark.arcpy
-def test_Operation_extract_direction1():
+def test_Process_extract_direction1():
     hut = testHut()
     model = hut["testmodel"]
-    opx.extractDirectionFromDfsu(model.results["DFSU_REULTS_ANIMATED"], model.pfiles["DFSU_RESULTS_DIRECTION"], 32)
+    proc.extractDirectionFromDfsu(model.results["DFSU_REULTS_ANIMATED"], model.pfiles["DFSU_RESULTS_DIRECTION"], 32)
 
     # check if dfsu data shape and values are same
     data1 = Dfsu(model.results["DFSU_REULTS_ANIMATED"]).read(time_steps=32)["Current direction"]
@@ -92,10 +81,10 @@ def test_Operation_extract_direction1():
     assert np.allclose(data1, data2,1e-05,equal_nan=True)
 
 @pytest.mark.arcpy
-def test_Operation_extract_direction2():
+def test_Process_extract_direction2():
     hut = testHut()
     model = hut["testmodel"]
-    model.addPredefinedOperation("extractDirectionFromDfsu")
+    model.addProcessAuto("extractDirectionFromDfsu")
     model.runstack[len(model.runstack)-1].run()
 
     data1 = Dfsu(model.results["DFSU_REULTS_ANIMATED"]).read(time_steps=32)["Current direction"]
@@ -106,29 +95,29 @@ def test_Operation_extract_direction2():
 # Create geodatabase for model results, if not existing already
 # ---------------------------------------------------------------------------------------------------------------
 
-def test_Operation_create_gdb_args1():
+def test_Process_create_gdb_args1():
     hut = testHut()
     model = hut["testmodel"]
-    model.addPredefinedOperation("createGDB")
+    model.addProcessAuto("createGDB")
     rs = model.runstack[len(model.runstack)-1]
-    assert rs.func == opx.createGDB
+    assert rs.func == proc.createGDB
 
-def test_Operation_create_gdb_args2():
+def test_Process_create_gdb_args2():
     hut = testHut()
     model = hut["testmodel"]
-    model.addPredefinedOperation("createGDB")
+    model.addProcessAuto("createGDB")
     rs = model.runstack[len(model.runstack)-1]
     assert rs.args == (r"tests\data\test_output\testmodel.gdb", "testmodel")
 
 @pytest.mark.arcpy
-def test_Operation_create_gdb1():
+def test_Process_create_gdb1():
     hut = testHut()
     model = hut["testmodel"]
 
     if os.path.exists(model.params["MODEL_GDB_PATH"]):
         shutil.rmtree(model.params["MODEL_GDB_PATH"])
 
-    model.addPredefinedOperation("createGDB")
+    model.addProcessAuto("createGDB")
     model.runstack[len(model.runstack)-1].run()
 
     assert os.path.exists(model.params["MODEL_GDB_PATH"])
@@ -137,40 +126,40 @@ def test_Operation_create_gdb1():
 # Converts ASC 2d depth files to gdb
 # ---------------------------------------------------------------------------------------------------------------
 
-def test_Operation_processASC_2DDepth_args1():
+def test_Process_processASC_2DDepth_args1():
     hut = testHut()
     model = hut["testmodel"]
-    model.addPredefinedOperation("processASC_2DDepth")
+    model.addProcessAuto("processASC_2DDepth")
     rs = model.runstack[len(model.runstack)-1]
-    assert rs.func == opx.ascToGDB
+    assert rs.func == proc.ascToGDB
 
-def test_Operation_processASC_2DDepth_args2():
+def test_Process_processASC_2DDepth_args2():
     hut = testHut()
     model = hut["testmodel"]
-    model.addPredefinedOperation("processASC_2DDepth")
+    model.addProcessAuto("processASC_2DDepth")
     rs = model.runstack[len(model.runstack)-1]
     assert rs.args[0] == r"tests\data\MIKE\test_max_results_depth0.asc"
 
-def test_Operation_processASC_2DDepth_args3():
+def test_Process_processASC_2DDepth_args3():
     hut = testHut()
     model = hut["testmodel"]
-    model.addPredefinedOperation("processASC_2DDepth")
+    model.addProcessAuto("processASC_2DDepth")
     rs = model.runstack[len(model.runstack)-1]
     assert rs.args[1] == r"tests\data\test_output\testmodel.gdb"
 
-def test_Operation_processASC_2DDepth_args4():
+def test_Process_processASC_2DDepth_args4():
     hut = testHut()
     model = hut["testmodel"]
-    model.addPredefinedOperation("processASC_2DDepth")
+    model.addProcessAuto("processASC_2DDepth")
     rs = model.runstack[len(model.runstack)-1]
-    assert rs.args[2] == "testmodel_2D_Depth"
+    assert rs.args[2] == "testmodel_2d_dep"
 
 # check it outputs raster to gdb
 @pytest.mark.arcpy
-def test_Operation_processASC_2DDepth_1():
+def test_Process_processASC_2DDepth_1():
     hut = testHut()
     model = hut["testmodel"]
-    model.addPredefinedOperation("processASC_2DDepth")
+    model.addProcessAuto("processASC_2DDepth")
     rs = model.runstack[len(model.runstack)-1]
     rs.run()
 
@@ -183,40 +172,40 @@ def test_Operation_processASC_2DDepth_1():
 # Converts ASC velocity files to gdb
 # ---------------------------------------------------------------------------------------------------------------
 
-def test_Operation_processASC_2DVelocity_args1():
+def test_Process_processASC_2DVelocity_args1():
     hut = testHut()
     model = hut["testmodel"]
-    model.addPredefinedOperation("processASC_2DVelocity")
+    model.addProcessAuto("processASC_2DVelocity")
     rs = model.runstack[len(model.runstack)-1]
-    assert rs.func == opx.ascToGDB
+    assert rs.func == proc.ascToGDB
 
-def test_Operation_processASC_2DVelocity_args2():
+def test_Process_processASC_2DVelocity_args2():
     hut = testHut()
     model = hut["testmodel"]
-    model.addPredefinedOperation("processASC_2DVelocity")
+    model.addProcessAuto("processASC_2DVelocity")
     rs = model.runstack[len(model.runstack)-1]
     assert rs.args[0] == r"tests\data\MIKE\test_max_results_speed0.asc"
 
-def test_Operation_processASC_2DVelocity_args3():
+def test_Process_processASC_2DVelocity_args3():
     hut = testHut()
     model = hut["testmodel"]
-    model.addPredefinedOperation("processASC_2DVelocity")
+    model.addProcessAuto("processASC_2DVelocity")
     rs = model.runstack[len(model.runstack)-1]
     assert rs.args[1] == r"tests\data\test_output\testmodel.gdb"
 
-def test_Operation_processASC_2DVelocity_args4():
+def test_Process_processASC_2DVelocity_args4():
     hut = testHut()
     model = hut["testmodel"]
-    model.addPredefinedOperation("processASC_2DVelocity")
+    model.addProcessAuto("processASC_2DVelocity")
     rs = model.runstack[len(model.runstack)-1]
-    assert rs.args[2] == "testmodel_2D_Velocity"
+    assert rs.args[2] == "testmodel_2d_vel"
 
 # check it outputs raster to gdb
 @pytest.mark.arcpy
-def test_Operation_processASC_2DVelocity_1():
+def test_Process_processASC_2DVelocity_1():
     hut = testHut()
     model = hut["testmodel"]
-    model.addPredefinedOperation("processASC_2DVelocity")
+    model.addProcessAuto("processASC_2DVelocity")
     rs = model.runstack[len(model.runstack)-1]
     rs.run()
 
@@ -229,40 +218,40 @@ def test_Operation_processASC_2DVelocity_1():
 # Converts ASC direction files to gdb
 # ---------------------------------------------------------------------------------------------------------------
 
-def test_Operation_processASC_2DDirection_args1():
+def test_Process_processASC_2DDirection_args1():
     hut = testHut()
     model = hut["testmodel"]
-    model.addPredefinedOperation("processASC_2DDirection")
+    model.addProcessAuto("processASC_2DDirection")
     rs = model.runstack[len(model.runstack)-1]
-    assert rs.func == opx.ascToGDB
+    assert rs.func == proc.ascToGDB
 
-def test_Operation_processASC_2DDirection_args2():
+def test_Process_processASC_2DDirection_args2():
     hut = testHut()
     model = hut["testmodel"]
-    model.addPredefinedOperation("processASC_2DDirection")
+    model.addProcessAuto("processASC_2DDirection")
     rs = model.runstack[len(model.runstack)-1]
     assert rs.args[0] == r"tests\data\MIKE\test_animated_results_direction32.asc"
 
-def test_Operation_processASC_2DDirection_args3():
+def test_Process_processASC_2DDirection_args3():
     hut = testHut()
     model = hut["testmodel"]
-    model.addPredefinedOperation("processASC_2DDirection")
+    model.addProcessAuto("processASC_2DDirection")
     rs = model.runstack[len(model.runstack)-1]
     assert rs.args[1] == r"tests\data\test_output\testmodel.gdb"
 
-def test_Operation_processASC_2DDirection_args4():
+def test_Process_processASC_2DDirection_args4():
     hut = testHut()
     model = hut["testmodel"]
-    model.addPredefinedOperation("processASC_2DDirection")
+    model.addProcessAuto("processASC_2DDirection")
     rs = model.runstack[len(model.runstack)-1]
-    assert rs.args[2] == "testmodel_2D_Direction"
+    assert rs.args[2] == "testmodel_2d_dir"
 
 # check it outputs raster to gdb
 @pytest.mark.arcpy
-def test_Operation_processASC_2DDirection_1():
+def test_Process_processASC_2DDirection_1():
     hut = testHut()
     model = hut["testmodel"]
-    model.addPredefinedOperation("processASC_2DDirection")
+    model.addProcessAuto("processASC_2DDirection")
     rs = model.runstack[len(model.runstack)-1]
     rs.run()
 
@@ -275,40 +264,40 @@ def test_Operation_processASC_2DDirection_1():
 # Converts ASC river files to gdb
 # ---------------------------------------------------------------------------------------------------------------
 
-def test_Operation_processASC_RiverDepth_args1():
+def test_Process_processASC_RiverDepth_args1():
     hut = testHut()
     model = hut["testmodel"]
-    model.addPredefinedOperation("processASC_RiverDepth")
+    model.addProcessAuto("processASC_RiverDepth")
     rs = model.runstack[len(model.runstack)-1]
-    assert rs.func == opx.ascToGDB
+    assert rs.func == proc.ascToGDB
 
-def test_Operation_processASC_RiverDepth_args2():
+def test_Process_processASC_RiverDepth_args2():
     hut = testHut()
     model = hut["testmodel"]
-    model.addPredefinedOperation("processASC_RiverDepth")
+    model.addProcessAuto("processASC_RiverDepth")
     rs = model.runstack[len(model.runstack)-1]
     assert rs.args[0] == r"tests\data\MIKE\test_max_results_depth0.asc"
 
-def test_Operation_processASC_RiverDepth_args3():
+def test_Process_processASC_RiverDepth_args3():
     hut = testHut()
     model = hut["testmodel"]
-    model.addPredefinedOperation("processASC_RiverDepth")
+    model.addProcessAuto("processASC_RiverDepth")
     rs = model.runstack[len(model.runstack)-1]
     assert rs.args[1] == r"tests\data\test_output\testmodel.gdb"
 
-def test_Operation_processASC_RiverDepth_args4():
+def test_Process_processASC_RiverDepth_args4():
     hut = testHut()
     model = hut["testmodel"]
-    model.addPredefinedOperation("processASC_RiverDepth")
+    model.addProcessAuto("processASC_RiverDepth")
     rs = model.runstack[len(model.runstack)-1]
-    assert rs.args[2] == "testmodel_River_Depth"
+    assert rs.args[2] == "testmodel_riv_dep"
 
 # check it outputs raster to gdb
 @pytest.mark.arcpy
-def test_Operation_processASC_RiverDepth_1():
+def test_Process_processASC_RiverDepth_1():
     hut = testHut()
     model = hut["testmodel"]
-    model.addPredefinedOperation("processASC_RiverDepth")
+    model.addProcessAuto("processASC_RiverDepth")
     rs = model.runstack[len(model.runstack)-1]
     rs.run()
 
@@ -322,47 +311,47 @@ def test_Operation_processASC_RiverDepth_1():
 # Clip all rasters
 # ---------------------------------------------------------------------------------------------------------------
 
-def test_Operation_clip_rasters_args1():
+def test_Process_clip_rasters_args1():
     hut = testHut()
     model = hut["testmodel"]
-    model.addPredefinedOperation("processClipResults")
+    model.addProcessAuto("processClipResults")
     rs = model.runstack[len(model.runstack)-1]
-    assert rs.func == opx.clipAllRasters
+    assert rs.func == proc.clipAllRasters
 
-def test_Operation_clip_rasters_args2():
+def test_Process_clip_rasters_args2():
     hut = testHut()
     model = hut["testmodel"]
-    model.addPredefinedOperation("processClipResults")
+    model.addProcessAuto("processClipResults")
     rs = model.runstack[len(model.runstack)-1]
     assert rs.args[0] == r"tests\data\test_output\testmodel.gdb"
 
-def test_Operation_clip_rasters_args3():
+def test_Process_clip_rasters_args3():
     hut = testHut()
     model = hut["testmodel"]
-    model.addPredefinedOperation("processClipResults")
+    model.addProcessAuto("processClipResults")
     rs = model.runstack[len(model.runstack)-1]
     assert rs.args[1] == r"tests\data\clip_polygons.shp"
 
-def test_Operation_clip_rasters_args4():
+def test_Process_clip_rasters_args4():
     hut = testHut()
     model = hut["testmodel"]
-    model.addPredefinedOperation("processClipResults")
+    model.addProcessAuto("processClipResults")
     rs = model.runstack[len(model.runstack)-1]
     assert rs.args[2] == r"Name"
 
-def test_Operation_clip_rasters_args5():
+def test_Process_clip_rasters_args5():
     hut = testHut()
     model = hut["testmodel"]
-    model.addPredefinedOperation("processClipResults")
+    model.addProcessAuto("processClipResults")
     rs = model.runstack[len(model.runstack)-1]
     assert rs.args[3] == r"testmodel"
 
 # check it outputs clip raster to gdb
 @pytest.mark.arcpy
-def test_Operation_clip_rasters_1():
+def test_Process_clip_rasters_1():
     hut = testHut()
     model = hut["testmodel"]
-    model.addPredefinedOperation("processClipResults")
+    model.addProcessAuto("processClipResults")
     rs = model.runstack[len(model.runstack)-1]
 
     rs.run()
@@ -383,32 +372,32 @@ def test_Operation_clip_rasters_1():
 # Set coordinate system
 # ---------------------------------------------------------------------------------------------------------------
 
-def test_Operation_set_CRS_args1():
+def test_Process_set_CRS_args1():
     hut = testHut()
     model = hut["testmodel"]
-    model.addPredefinedOperation("processCRS")
+    model.addProcessAuto("processCRS")
     rs = model.runstack[len(model.runstack)-1]
-    assert rs.func == opx.setCRS
+    assert rs.func == proc.setCRS
 
-def test_Operation_set_CRS_args2():
+def test_Process_set_CRS_args2():
     hut = testHut()
     model = hut["testmodel"]
-    model.addPredefinedOperation("processCRS")
+    model.addProcessAuto("processCRS")
     rs = model.runstack[len(model.runstack)-1]
     assert rs.args[0] == r"tests\data\test_output\testmodel.gdb"
 
-def test_Operation_set_CRS_args3():
+def test_Process_set_CRS_args3():
     hut = testHut()
     model = hut["testmodel"]
-    model.addPredefinedOperation("processCRS")
+    model.addProcessAuto("processCRS")
     rs = model.runstack[len(model.runstack)-1]
     assert rs.args[1] == r"ETRS 1989 UTM Zone 32N"
 
 @pytest.mark.arcpy
-def test_Operation_set_CRS_1():
+def test_Process_set_CRS_1():
     hut = testHut()
     model = hut["testmodel"]
-    model.addPredefinedOperation("processCRS")
+    model.addProcessAuto("processCRS")
     rs = model.runstack[len(model.runstack)-1]
     rs.run()
 
@@ -423,47 +412,47 @@ def test_Operation_set_CRS_1():
 # Merges river and 2d into one
 # ---------------------------------------------------------------------------------------------------------------
 
-def test_Operation_merge_river_with_2d_args1():
+def test_Process_merge_river_with_2d_args1():
     hut = testHut()
     model = hut["testmodel"]
-    model.addPredefinedOperation("processMergeRiver2DDepth")
+    model.addProcessAuto("processMergeRiver2DDepth")
     rs = model.runstack[len(model.runstack)-1]
-    assert rs.func == opx.mergeRasters
+    assert rs.func == proc.mergeRasters
 
 
-def test_Operation_merge_river_with_2d_args2():
+def test_Process_merge_river_with_2d_args2():
     hut = testHut()
     model = hut["testmodel"]
-    model.addPredefinedOperation("processMergeRiver2DDepth")
+    model.addProcessAuto("processMergeRiver2DDepth")
     rs = model.runstack[len(model.runstack)-1]
-    assert rs.args[0] == r"testmodel_2D_Depth"
+    assert rs.args[0] == r"testmodel_2d_dep"
 
-def test_Operation_merge_river_with_2d_args3():
+def test_Process_merge_river_with_2d_args3():
     hut = testHut()
     model = hut["testmodel"]
-    model.addPredefinedOperation("processMergeRiver2DDepth")
+    model.addProcessAuto("processMergeRiver2DDepth")
     rs = model.runstack[len(model.runstack)-1]
-    assert rs.args[1] == r"testmodel_River_Depth"
+    assert rs.args[1] == r"testmodel_riv_dep"
 
-def test_Operation_merge_river_with_2d_args4():
+def test_Process_merge_river_with_2d_args4():
     hut = testHut()
     model = hut["testmodel"]
-    model.addPredefinedOperation("processMergeRiver2DDepth")
+    model.addProcessAuto("processMergeRiver2DDepth")
     rs = model.runstack[len(model.runstack)-1]
-    assert rs.args[2] == r"testmodel_Full_Depth"
+    assert rs.args[2] == r"testmodel_full_dep"
 
-def test_Operation_merge_river_with_2d_args5():
+def test_Process_merge_river_with_2d_args5():
     hut = testHut()
     model = hut["testmodel"]
-    model.addPredefinedOperation("processMergeRiver2DDepth")
+    model.addProcessAuto("processMergeRiver2DDepth")
     rs = model.runstack[len(model.runstack)-1]
     assert rs.args[3] == r"tests\data\test_output\testmodel.gdb"
 
 @pytest.mark.arcpy
-def test_Operation_merge_river_with_2d_1():
+def test_Process_merge_river_with_2d_1():
     hut = testHut()
     model = hut["testmodel"]
-    model.addPredefinedOperation("processMergeRiver2DDepth")
+    model.addProcessAuto("processMergeRiver2DDepth")
     rs = model.runstack[len(model.runstack)-1]
     rs.run()
 

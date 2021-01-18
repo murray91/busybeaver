@@ -1,9 +1,6 @@
-import configparser
 import logging
-import collections
 import os
-
-import processes as proc
+import busybeaver.processes as proc
 
 logging.basicConfig(filename='bb.log', filemode='w', format='%(asctime)s - %(levelname)s: %(message)s', 
                     datefmt='%m/%d/%Y %I:%M:%S %p', level=logging.INFO)
@@ -75,7 +72,7 @@ class Model:
     """
     def __init__(self, model_name):
         
-        logging.info("Created model: {}.".format(self.name))
+        logging.info("Created model: {}.".format(model_name))
         self.name = model_name
         self.runstack = []
         self.params = {
@@ -145,7 +142,7 @@ class Model:
                         "processTIF_2DDepth" : 
                             [proc.dfsuToTif, 
                                 self.params["DFSU_RESULTS_MAX"], 
-                                self.params["Maximum water depth"], 
+                                "Maximum water depth", 
                                 0, # what is this zero for?
                                 self.params["2D_DEPTH_TIF_NAME"]],
 
@@ -203,7 +200,7 @@ class Model:
                     }
 
         logging.debug("Adding process to runstack of model {}: {}".format(self.name, name))
-        self.runstack.append(Process(name, PROCESSES[name][0], PROCESSES[name][1:]))  
+        self.runstack.append(Process(name, PROCESSES[name][0], *PROCESSES[name][1:]))  
 
 class Process:
     """

@@ -39,6 +39,10 @@ class Hut:
     def setAll(self, param, value):
         for model in self.models:
             model.params[param] = value
+
+    # add a way to find relevant asc files for model
+    # regex example: .*mymodel.*depth.*asc$ .... finds any paths with mymodel and depth in it which ends in .asc
+    # this function also might be better placed in the Model object
     
     def runAll(self):
         logging.info("Starting to run processs for all models.")
@@ -76,6 +80,7 @@ class Model:
         self.name = model_name
         self.runstack = []
         self.params = {
+                "MODEL_GDB_PATH" : None,           # Path to folder with the model's GDB (saves output to .gdb in this folder)
                 "DFSU_REULTS_ANIMATED" : None,     # animated dfsu results from MIKE
                 "DFSU_RESULTS_MAX" : None,         # max dfsu results from MIKE
                 "DFSU_RESULTS_DIRECTION" : None,   # Output location for extractDirectionFromDfsu
@@ -84,7 +89,6 @@ class Model:
                 "VELOCITY_2D_ASC" : None,          # MIKE 2d max velocity in asc format
                 "DIRECTION_2D_ASC" : None,         # MIKE 2d direction in asc format
                 "MODEL_BOUNDARY_POLYGON" : None,   # Boundaries to clip model results to
-                "MODEL_GDB_PATH" : None,           # Path to the model's GDB (with .gdb extension)
                 "DIRECTION_TIMESTEP" : None,       # Integer timestep to extract direction from dfsu in model
                 "2D_DEPTH_TIF_NAME" : None,        # Name of 2d depth raster (exclusing river) in tif format
                 "2D_DEPTH_GDB_NAME" : None,        # Name of 2d depth raster (exclusing river) in gdb

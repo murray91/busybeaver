@@ -22,9 +22,7 @@ def FOR_TESTING_ONLY(*args):
 #   extractDirectionFromDfsu("mydfsu.dfsu", "mydfsu_direction", 30)  
 # 
 # Assumes
-#   -input dfsu has Current direction
-#   -timestep specified exists
-#   -Current direction unit is radians, but outputs to degrees
+#   -input dfsu has item Current direction in radians
 #  
 def extractDirectionFromDfsu(input_dfsu, output_dfsu, timestep):
 
@@ -42,14 +40,12 @@ def extractDirectionFromDfsu(input_dfsu, output_dfsu, timestep):
 
     # Write direction to new dfsu
     dfs.write(output_dfsu, newds)
-    
-    return True
 
 # createGDB
 # Creates a geodatabase for model
 #
 # Example usage:
-#   createGD("C:/some/path/to", "Name of GDB")
+#   createGD("C:/some/path/to", "Name of GDB.gdb")
 # 
 
 def createGDB(gdb_path, gdb_name):
@@ -62,8 +58,6 @@ def createGDB(gdb_path, gdb_name):
         logging.info("Geodatabase created at:\n{}".format(gdb_path))
     else:
         logging.info("Geodatabase already exists for {}.".format(gdb_name))
-    
-    return True
 
 # ascToGDB
 # Converts an asc file to a raster and adds it to gdb. Overwrites if already exists.        

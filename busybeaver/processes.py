@@ -118,6 +118,43 @@ def clipAllRasters(gdb_name, clip_shapefile, clip_field, field_value):
 
     return True
 
+# clipOneRaster
+# Clips one raster in gdb to a polygon found in a shapefile matching field name and id
+#
+# Example usage:
+#   clipOneRaster("mygdb.gdb", "raster name", "some_clip_file.shp", "selection field name", "polygon id")
+# 
+def clipOneRaster(gdb_name, raster_name, clip_shapefile, clip_field, field_value):
+
+    import arcpy
+
+    # convert relative paths to absolute to work with arcpy function
+    clip_shapefile = os.path.abspath(clip_shapefile)
+    gdb_name = os.path.abspath(gdb_name)
+    arcpy.env.workspace = gdb_name
+
+    # Get clip geometry for specific model shapefile with several polygons
+    f = arcpy.FeatureSet(clip_shapefile)
+    cursor = arcpy.da.SearchCursor(f, ("{}".format(clip_field), "SHAPE@"),"""{}='{}'""".format(clip_field, field_value))
+    cursor.reset()
+    geom = None
+    for row in cursor:
+        geom = row[1]       
+
+    # Clip raster
+    logging.info("Clipping raster {}...".format(raster_name))
+    arcpy.Clip_management(
+            in_raster = raster_name, 
+            out_raster = "{}_CLIPPED".format(raster_name),
+            in_template_dataset = geom,
+            clipping_geometry = "ClippingGeometry")
+
+    # Delete unclipped raster and replace with new raster
+    arcpy.Delete_management(raster_name)
+    arcpy.Rename_management("{}_CLIPPED".format(raster_name), raster_name)
+
+    
+
 # setCRS
 # Sets the CRS of all rasters in a gdb
 #
@@ -187,7 +224,9 @@ def cleanRasters(gdb_name, depth, velocity, direction, depth_final, velocity_fin
     logging.info("Renaming final depth, velocity, and direction rasters.")
     arcpy.Rename_management(depth, depth_final)
     arcpy.Rename_management(velocity, velocity_final)
-    arcpy.Rename_management(direction, direction_final)
+    # included temporarily for project that did not have direction rasters yet
+    if direction is not None:
+        arcpy.Rename_management(direction, direction_final)
 
     # Delete all other rasters
     logging.info("Deleting all rasters which are not final.")

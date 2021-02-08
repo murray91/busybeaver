@@ -43,6 +43,11 @@ class Hut:
     # add a way to find relevant asc files for model
     # regex example: .*mymodel.*depth.*asc$ .... finds any paths with mymodel and depth in it which ends in .asc
     # this function also might be better placed in the Model object
+
+    # adds same auto process to all models in hut
+    def addAutoAll(self, process):
+        for model in self.models:
+            model.addProcessAuto(process)
     
     def runAll(self):
         logging.info("Starting to run processs for all models.")

@@ -222,21 +222,11 @@ def cleanRasters(gdb_name, depth, velocity, direction, depth_final, velocity_fin
 
     # Rename rasters to their final names
     logging.info("Renaming final depth, velocity, and direction rasters.")
-<<<<<<< HEAD
-    if depth != "None":
-        arcpy.Rename_management(depth, depth_final)
-    if velocity != "None":
-        arcpy.Rename_management(velocity, velocity_final)
-    if direction != "None":
-        arcpy.Rename_management(direction, direction_final)
-
-=======
     arcpy.Rename_management(depth, depth_final)
     arcpy.Rename_management(velocity, velocity_final)
     # included temporarily for project that did not have direction rasters yet
     if direction is not None:
         arcpy.Rename_management(direction, direction_final)
->>>>>>> noconfig
 
     # Delete all other rasters
     logging.info("Deleting all rasters which are not final.")
